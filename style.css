@@ -515,6 +515,12 @@ body {
     border-left: 3px solid var(--accent-primary);
 }
 
+.member-role-priority {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+}
+
 .member-roles {
     display: flex;
     flex-wrap: wrap;

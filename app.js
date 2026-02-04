@@ -531,6 +531,11 @@ function renderTeams(teams, showAll = false) {
                         ${isNew ? '<span class="member-new-badge">new</span>' : ''}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
+                    ${(member.roleTagIds && member.roleTagIds.length >= 2) ? (() => {
+                        const first = findRole(member.roleTagIds[0]);
+                        const second = findRole(member.roleTagIds[1]);
+                        return `<div class="member-role-priority">1st ${first ? first.emoji + ' ' + first.name : '—'} · 2nd ${second ? second.emoji + ' ' + second.name : '—'}</div>`;
+                    })() : ''}
                     <div class="member-roles">
                         ${(member.roleTagIds || []).map(id => {
                             const tag = findRole(id);
