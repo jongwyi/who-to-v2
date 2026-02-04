@@ -1,6 +1,25 @@
 // ============================================
-// WHO-TO V2 - Main Application Logic
+// WHO-TO V2 - Firebase Edition
 // ============================================
+
+// ============================================
+// FIREBASE CONFIG
+// ============================================
+
+const firebaseConfig = {
+    apiKey: "AIzaSyAN_uJM7v23CSv8et3sGKUJI04kDpVUIAU",
+    authDomain: "who-to-75f43.firebaseapp.com",
+    databaseURL: "https://who-to-75f43-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "who-to-75f43",
+    storageBucket: "who-to-75f43.firebasestorage.app",
+    messagingSenderId: "532213077301",
+    appId: "1:532213077301:web:c5a8301dc2105d478c287c",
+    measurementId: "G-8M5X3DL7FS"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
 // ============================================
 // TAG DEFINITIONS
@@ -30,10 +49,6 @@ const state = {
     currentScreen: 'landing',
     profileStep: 1,
 
-    // Session data
-    sessions: {},  // id -> session
-    sessionsByCode: {},  // code -> id
-
     // Current user state
     currentSession: null,
     currentStudent: null,
@@ -51,7 +66,7 @@ const state = {
 // ============================================
 
 function generateId() {
-    return 'id-' + Math.random().toString(36).substr(2, 9);
+    return 'id-' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
 }
 
 function generateSessionCode() {
@@ -61,6 +76,54 @@ function generateSessionCode() {
         code += chars.charAt(Math.floor(Math.random() * chars.length));
     }
     return code;
+}
+
+// ============================================
+// FIREBASE DATABASE FUNCTIONS
+// ============================================
+
+// Create a new session in Firebase
+async function createSessionInDB(session) {
+    await db.ref('sessions/' + session.code).set(session);
+    return session;
+}
+
+// Get session by code from Firebase
+async function getSessionByCode(code) {
+    const snapshot = await db.ref('sessions/' + code.toUpperCase()).once('value');
+    return snapshot.val();
+}
+
+// Update session in Firebase
+async function updateSessionInDB(code, updates) {
+    await db.ref('sessions/' + code).update(updates);
+}
+
+// Add or update student in session
+async function saveStudentInDB(code, student) {
+    await db.ref('sessions/' + code + '/students/' + student.id).set(student);
+}
+
+// Get student from session
+async function getStudentFromDB(code, studentId) {
+    const snapshot = await db.ref('sessions/' + code + '/students/' + studentId).once('value');
+    return snapshot.val();
+}
+
+// Save teams to session
+async function saveTeamsInDB(code, teams) {
+    await db.ref('sessions/' + code + '/teams').set(teams);
+    await db.ref('sessions/' + code + '/status').set('published');
+}
+
+// Listen for session changes (real-time updates)
+function listenToSession(code, callback) {
+    db.ref('sessions/' + code).on('value', (snapshot) => {
+        const session = snapshot.val();
+        if (session) {
+            callback(session);
+        }
+    });
 }
 
 // ============================================
@@ -91,12 +154,12 @@ function jaccardDistance(setA, setB) {
 }
 
 function calculatePairwiseScore(studentA, studentB, weights) {
-    const rolesA = new Set(studentA.roleTagIds);
-    const rolesB = new Set(studentB.roleTagIds);
+    const rolesA = new Set(studentA.roleTagIds || []);
+    const rolesB = new Set(studentB.roleTagIds || []);
     const roleDiversity = jaccardDistance(rolesA, rolesB);
 
-    const interestsA = new Set(studentA.interestTagIds);
-    const interestsB = new Set(studentB.interestTagIds);
+    const interestsA = new Set(studentA.interestTagIds || []);
+    const interestsB = new Set(studentB.interestTagIds || []);
     const interestSimilarity = jaccardSimilarity(interestsA, interestsB);
 
     return weights.role * roleDiversity + weights.interest * interestSimilarity;
@@ -141,7 +204,6 @@ function greedyTeamFormation(students, teamSize, matrix) {
     for (let t = 0; t < numTeams; t++) {
         const team = [];
 
-        // Find best seed
         let bestSeed = -1;
         let bestAvg = -1;
 
@@ -160,7 +222,6 @@ function greedyTeamFormation(students, teamSize, matrix) {
             assigned[bestSeed] = true;
         }
 
-        // Greedily add members
         while (team.length < teamSize) {
             let bestCandidate = -1;
             let bestScore = -1;
@@ -195,7 +256,10 @@ function greedyTeamFormation(students, teamSize, matrix) {
 }
 
 function runMatching(session) {
-    const students = session.students;
+    // Convert students object to array
+    const studentsObj = session.students || {};
+    const students = Object.values(studentsObj).filter(s => s.roleTagIds && s.roleTagIds.length > 0);
+
     if (students.length === 0) return [];
 
     const total = session.weightRole + session.weightInterest;
@@ -260,26 +324,21 @@ function renderInterestTags() {
 function renderProfileStep(step) {
     state.profileStep = step;
 
-    // Update step dots
     document.querySelectorAll('.step-dot').forEach((dot, i) => {
         dot.classList.remove('active', 'completed');
         if (i + 1 === step) dot.classList.add('active');
         if (i + 1 < step) dot.classList.add('completed');
     });
 
-    // Update title
     const titles = ['Your Roles', 'Your Interests', 'Message to Team'];
     document.getElementById('profile-step-title').textContent = `Step ${step}/3 — ${titles[step - 1]}`;
 
-    // Show correct step
     document.querySelectorAll('.profile-step').forEach((el, i) => {
         el.classList.toggle('active', i + 1 === step);
     });
 
-    // Update back button
     document.getElementById('btn-profile-back').textContent = step === 1 ? '← Back' : '← Previous';
 
-    // Update next button
     const nextBtn = document.getElementById('btn-profile-next');
     nextBtn.textContent = step === 3 ? 'Submit ✓' : 'Next →';
 
@@ -289,24 +348,29 @@ function renderProfileStep(step) {
 function renderTeams(teams, showAll = false) {
     const container = document.getElementById('teams-container');
 
+    if (!teams || teams.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No teams yet.</p>';
+        return;
+    }
+
     container.innerHTML = teams.map(team => `
         <div class="team-card">
             <div class="team-header">
                 <h3 class="team-name">🎯 ${team.name}</h3>
                 <span class="team-score">Cohesion: ${(team.cohesionScore * 100).toFixed(0)}%</span>
             </div>
-            ${team.members.map(member => `
+            ${(team.members || []).map(member => `
                 <div class="member-card">
                     <div class="member-name">
                         👤 ${member.name}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
                     <div class="member-tags">
-                        ${member.roleTagIds.map(id => {
+                        ${(member.roleTagIds || []).map(id => {
         const tag = ROLE_TAGS.find(t => t.id === id);
         return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
     }).join('')}
-                        ${member.interestTagIds.filter(id => id !== 'others').map(id => {
+                        ${(member.interestTagIds || []).filter(id => id !== 'others').map(id => {
         const tag = INTEREST_TAGS.find(t => t.id === id);
         return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
     }).join('')}
@@ -329,8 +393,9 @@ function renderDashboard() {
         `Team Size: ${session.teamSize} • Weights: ${session.weightRole}% Role / ${session.weightInterest}% Interest`;
     document.getElementById('dashboard-status').textContent =
         session.status === 'published' ? '✅ Teams Published' : '⏳ Open for Registration';
-    document.getElementById('dashboard-student-count').textContent =
-        `Students joined: ${session.students.length}`;
+
+    const studentCount = session.students ? Object.keys(session.students).length : 0;
+    document.getElementById('dashboard-student-count').textContent = `Students joined: ${studentCount}`;
 
     const runBtn = document.getElementById('btn-run-matching');
     if (session.status === 'published') {
@@ -352,13 +417,12 @@ function validateProfileStep() {
         valid = state.selectedRoles.length > 0;
     } else if (state.profileStep === 2) {
         valid = state.selectedInterests.length > 0;
-        // If "others" selected, need custom input
         if (state.selectedInterests.includes('others')) {
             const customInput = document.getElementById('custom-interest').value.trim();
             valid = valid && customInput.length > 0;
         }
     } else if (state.profileStep === 3) {
-        valid = true; // Message is optional
+        valid = true;
     }
 
     nextBtn.disabled = !valid;
@@ -409,67 +473,82 @@ function initEventListeners() {
     studentPasswordInput.addEventListener('input', validateJoinForm);
 
     // Join session
-    document.getElementById('btn-join-session').addEventListener('click', () => {
+    document.getElementById('btn-join-session').addEventListener('click', async () => {
         const code = document.getElementById('display-join-code').textContent;
         const name = studentNameInput.value.trim();
         const password = studentPasswordInput.value.trim();
 
-        const sessionId = state.sessionsByCode[code];
-        if (!sessionId) {
-            document.getElementById('join-error').textContent = 'Session not found. Check the code.';
-            return;
-        }
+        try {
+            const session = await getSessionByCode(code);
 
-        const session = state.sessions[sessionId];
-
-        // Check if student exists
-        let student = session.students.find(s => s.name.toLowerCase() === name.toLowerCase());
-
-        if (student) {
-            if (student.password !== password) {
-                document.getElementById('join-error').textContent = 'Wrong password.';
+            if (!session) {
+                document.getElementById('join-error').textContent = 'Session not found. Check the code.';
                 return;
             }
-            // Returning student
-            state.currentStudent = student;
+
             state.currentSession = session;
 
-            if (student.roleTagIds.length > 0) {
-                // Already submitted
-                if (session.status === 'published') {
-                    const myTeam = session.teams.find(t => t.memberIds.includes(student.id));
-                    document.getElementById('results-title').textContent = '🎉 Your Team';
-                    renderTeams(myTeam ? [myTeam] : []);
-                    showScreen('results');
+            // Check if student exists
+            const students = session.students || {};
+            let student = Object.values(students).find(s => s.name.toLowerCase() === name.toLowerCase());
+
+            if (student) {
+                if (student.password !== password) {
+                    document.getElementById('join-error').textContent = 'Wrong password.';
+                    return;
+                }
+                state.currentStudent = student;
+
+                if (student.roleTagIds && student.roleTagIds.length > 0) {
+                    if (session.status === 'published') {
+                        const teams = session.teams ? Object.values(session.teams) : [];
+                        const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(student.id));
+                        document.getElementById('results-title').textContent = '🎉 Your Team';
+                        renderTeams(myTeam ? [myTeam] : []);
+                        showScreen('results');
+                    } else {
+                        // Start listening for updates
+                        listenToSession(code, (updatedSession) => {
+                            state.currentSession = updatedSession;
+                            if (updatedSession.status === 'published') {
+                                const teams = updatedSession.teams ? Object.values(updatedSession.teams) : [];
+                                const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(state.currentStudent.id));
+                                document.getElementById('results-title').textContent = '🎉 Your Team';
+                                renderTeams(myTeam ? [myTeam] : []);
+                                showScreen('results');
+                            }
+                        });
+                        showScreen('waiting');
+                    }
                 } else {
-                    showScreen('waiting');
+                    renderRoleTags();
+                    renderInterestTags();
+                    renderProfileStep(1);
+                    showScreen('profile-input');
                 }
             } else {
+                // New student
+                student = {
+                    id: generateId(),
+                    name: name,
+                    password: password,
+                    roleTagIds: [],
+                    interestTagIds: [],
+                    customInterest: '',
+                    messageToTeam: '',
+                    teamId: null
+                };
+
+                await saveStudentInDB(code, student);
+                state.currentStudent = student;
+
                 renderRoleTags();
                 renderInterestTags();
                 renderProfileStep(1);
                 showScreen('profile-input');
             }
-        } else {
-            // New student
-            student = {
-                id: generateId(),
-                name: name,
-                password: password,
-                roleTagIds: [],
-                interestTagIds: [],
-                customInterest: '',
-                messageToTeam: '',
-                teamId: null
-            };
-            session.students.push(student);
-            state.currentStudent = student;
-            state.currentSession = session;
-
-            renderRoleTags();
-            renderInterestTags();
-            renderProfileStep(1);
-            showScreen('profile-input');
+        } catch (err) {
+            document.getElementById('join-error').textContent = 'Error: ' + err.message;
         }
     });
 
@@ -499,7 +578,7 @@ function initEventListeners() {
     });
 
     // Create session
-    document.getElementById('btn-create-session').addEventListener('click', () => {
+    document.getElementById('btn-create-session').addEventListener('click', async () => {
         const sessionName = sessionNameInput.value.trim();
         const code = generateSessionCode();
         const roleWeight = parseInt(weightRoleSlider.value);
@@ -513,17 +592,28 @@ function initEventListeners() {
             weightRole: roleWeight,
             weightInterest: 100 - roleWeight,
             status: 'open',
-            students: [],
-            teams: []
+            students: {},
+            teams: {}
         };
 
-        state.sessions[session.id] = session;
-        state.sessionsByCode[code] = session.id;
-        state.currentSession = session;
-        state.isInstructor = true;
+        try {
+            await createSessionInDB(session);
+            state.currentSession = session;
+            state.isInstructor = true;
 
-        renderDashboard();
-        showScreen('instructor-dashboard');
+            // Listen for real-time updates
+            listenToSession(code, (updatedSession) => {
+                state.currentSession = updatedSession;
+                if (state.currentScreen === 'instructor-dashboard') {
+                    renderDashboard();
+                }
+            });
+
+            renderDashboard();
+            showScreen('instructor-dashboard');
+        } catch (err) {
+            document.getElementById('create-error').textContent = 'Error: ' + err.message;
+        }
     });
 
     // Tag selection
@@ -559,7 +649,6 @@ function initEventListeners() {
 
         tagItem.classList.toggle('selected');
 
-        // Show/hide custom input
         const customGroup = document.getElementById('custom-interest-group');
         customGroup.style.display = state.selectedInterests.includes('others') ? 'block' : 'none';
 
@@ -578,7 +667,7 @@ function initEventListeners() {
         }
     });
 
-    document.getElementById('btn-profile-next').addEventListener('click', () => {
+    document.getElementById('btn-profile-next').addEventListener('click', async () => {
         if (state.profileStep < 3) {
             renderProfileStep(state.profileStep + 1);
         } else {
@@ -589,56 +678,106 @@ function initEventListeners() {
             student.customInterest = document.getElementById('custom-interest').value.trim();
             student.messageToTeam = document.getElementById('message-to-team').value.trim();
 
-            // Reset form state
-            state.selectedRoles = [];
-            state.selectedInterests = [];
+            try {
+                await saveStudentInDB(state.currentSession.code, student);
 
-            if (state.currentSession.status === 'published') {
-                const myTeam = state.currentSession.teams.find(t => t.memberIds.includes(student.id));
-                document.getElementById('results-title').textContent = '🎉 Your Team';
-                renderTeams(myTeam ? [myTeam] : []);
-                showScreen('results');
-            } else {
+                // Reset form state
+                state.selectedRoles = [];
+                state.selectedInterests = [];
+
+                // Start listening for updates
+                listenToSession(state.currentSession.code, (updatedSession) => {
+                    state.currentSession = updatedSession;
+                    if (updatedSession.status === 'published') {
+                        const teams = updatedSession.teams ? Object.values(updatedSession.teams) : [];
+                        const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(student.id));
+                        document.getElementById('results-title').textContent = '🎉 Your Team';
+                        renderTeams(myTeam ? [myTeam] : []);
+                        showScreen('results');
+                    }
+                });
+
                 showScreen('waiting');
+            } catch (err) {
+                alert('Error saving profile: ' + err.message);
             }
         }
     });
 
     // Waiting: Check status
-    document.getElementById('btn-check-status').addEventListener('click', () => {
-        const session = state.currentSession;
-        if (session && session.status === 'published') {
-            const myTeam = session.teams.find(t => t.memberIds.includes(state.currentStudent.id));
-            document.getElementById('results-title').textContent = '🎉 Your Team';
-            renderTeams(myTeam ? [myTeam] : []);
-            showScreen('results');
+    document.getElementById('btn-check-status').addEventListener('click', async () => {
+        try {
+            const session = await getSessionByCode(state.currentSession.code);
+            state.currentSession = session;
+
+            if (session && session.status === 'published') {
+                const teams = session.teams ? Object.values(session.teams) : [];
+                const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(state.currentStudent.id));
+                document.getElementById('results-title').textContent = '🎉 Your Team';
+                renderTeams(myTeam ? [myTeam] : []);
+                showScreen('results');
+            }
+        } catch (err) {
+            console.error('Error checking status:', err);
         }
     });
 
     // Dashboard: Refresh
-    document.getElementById('btn-refresh').addEventListener('click', renderDashboard);
+    document.getElementById('btn-refresh').addEventListener('click', async () => {
+        try {
+            const session = await getSessionByCode(state.currentSession.code);
+            state.currentSession = session;
+            renderDashboard();
+        } catch (err) {
+            console.error('Error refreshing:', err);
+        }
+    });
 
     // Dashboard: Run matching
-    document.getElementById('btn-run-matching').addEventListener('click', () => {
+    document.getElementById('btn-run-matching').addEventListener('click', async () => {
         const session = state.currentSession;
 
         if (session.status === 'published') {
-            document.getElementById('results-title').textContent = 'All Teams';
-            document.getElementById('btn-back-dashboard').style.display = 'block';
-            renderTeams(session.teams, true);
-            showScreen('results');
-        } else {
-            // Run matching
-            const teams = runMatching(session);
-            session.teams = teams;
-            session.status = 'published';
-
-            renderDashboard();
-
+            const teams = session.teams ? Object.values(session.teams) : [];
             document.getElementById('results-title').textContent = 'All Teams';
             document.getElementById('btn-back-dashboard').style.display = 'block';
             renderTeams(teams, true);
             showScreen('results');
+        } else {
+            try {
+                // Get latest session data
+                const latestSession = await getSessionByCode(session.code);
+                state.currentSession = latestSession;
+
+                // Run matching
+                const teams = runMatching(latestSession);
+
+                if (teams.length === 0) {
+                    alert('No students have submitted their profiles yet!');
+                    return;
+                }
+
+                // Save teams to Firebase
+                const teamsObj = {};
+                teams.forEach(team => {
+                    teamsObj[team.id] = team;
+                });
+
+                await saveTeamsInDB(session.code, teamsObj);
+
+                // Update local state
+                state.currentSession.teams = teamsObj;
+                state.currentSession.status = 'published';
+
+                renderDashboard();
+
+                document.getElementById('results-title').textContent = 'All Teams';
+                document.getElementById('btn-back-dashboard').style.display = 'block';
+                renderTeams(teams, true);
+                showScreen('results');
+            } catch (err) {
+                alert('Error running matching: ' + err.message);
+            }
         }
     });
 
@@ -654,5 +793,5 @@ function initEventListeners() {
 
 document.addEventListener('DOMContentLoaded', () => {
     initEventListeners();
-    console.log('Who-To V2 initialized! 🎉');
+    console.log('Who-To V2 (Firebase Edition) initialized! 🔥');
 });

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Who-To | Find Your Perfect Team</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <main id="app">
         <!-- ========================================
@@ -22,7 +24,8 @@
                 <div class="card">
                     <div class="form-group">
                         <label class="form-label">Session Code</label>
-                        <input type="text" id="join-code" class="form-input" placeholder="Enter 6-character code" maxlength="6">
+                        <input type="text" id="join-code" class="form-input" placeholder="Enter 6-character code"
+                            maxlength="6">
                     </div>
                     <button id="btn-go-join" class="btn btn-primary btn-full" disabled>Join Session →</button>
                 </div>
@@ -48,7 +51,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" id="student-password" class="form-input" placeholder="Create a simple password">
+                        <input type="password" id="student-password" class="form-input"
+                            placeholder="Create a simple password">
                     </div>
                     <p id="join-error" class="error-text"></p>
                     <div class="nav-buttons">
@@ -77,7 +81,8 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" id="instructor-password" class="form-input" placeholder="Create a password">
+                        <input type="password" id="instructor-password" class="form-input"
+                            placeholder="Create a password">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Team Size</label>
@@ -137,14 +142,16 @@
                         <div class="tag-grid" id="interest-tags"></div>
                         <div id="custom-interest-group" class="form-group" style="display: none; margin-top: 1rem;">
                             <label class="form-label">Your Interest</label>
-                            <input type="text" id="custom-interest" class="form-input" placeholder="Type your interest...">
+                            <input type="text" id="custom-interest" class="form-input"
+                                placeholder="Type your interest...">
                         </div>
                     </div>
 
                     <!-- Step 3: Message -->
                     <div id="profile-step-3" class="profile-step">
                         <p class="step-instruction">One line to your future teammates:</p>
-                        <textarea id="message-to-team" class="form-input form-textarea" placeholder="Looking forward to building something cool together!"></textarea>
+                        <textarea id="message-to-team" class="form-input form-textarea"
+                            placeholder="Looking forward to building something cool together!"></textarea>
                         <p class="hint-text">This will be shown to your team members.</p>
                     </div>
 
@@ -204,12 +211,18 @@
                 <h2 id="results-title">Your Team</h2>
                 <div id="teams-container"></div>
                 <div class="nav-buttons">
-                    <button id="btn-back-dashboard" class="btn btn-ghost" style="display: none;">← Back to Dashboard</button>
+                    <button id="btn-back-dashboard" class="btn btn-ghost" style="display: none;">← Back to
+                        Dashboard</button>
                 </div>
             </div>
         </section>
     </main>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
     <script src="app.js"></script>
 </body>
+
 </html>
