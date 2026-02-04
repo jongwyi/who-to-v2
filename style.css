@@ -78,6 +78,15 @@ body {
 }
 
 /* Hero */
+.version-display {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0 0 var(--spacing-sm) 0;
+    letter-spacing: 1px;
+}
+
 .hero {
     text-align: center;
     padding: var(--spacing-xl) 0;
