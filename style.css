@@ -515,10 +515,20 @@ body {
     border-left: 3px solid var(--accent-primary);
 }
 
-.member-role-priority {
-    font-size: 0.8rem;
+.member-expected-role,
+.member-interest-realm {
+    font-size: 0.9rem;
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
+}
+
+.member-expected-role {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.member-interest-realm {
+    margin-bottom: var(--spacing-sm);
 }
 
 .member-roles {

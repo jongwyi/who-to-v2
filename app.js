@@ -531,24 +531,15 @@ function renderTeams(teams, showAll = false) {
                         ${isNew ? '<span class="member-new-badge">new</span>' : ''}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
-                    ${(member.roleTagIds && member.roleTagIds.length >= 2) ? (() => {
+                    ${(member.roleTagIds && member.roleTagIds.length >= 1) ? (() => {
                         const first = findRole(member.roleTagIds[0]);
-                        const second = findRole(member.roleTagIds[1]);
-                        return `<div class="member-role-priority">1st ${first ? first.emoji + ' ' + first.name : '—'} · 2nd ${second ? second.emoji + ' ' + second.name : '—'}</div>`;
+                        return `<div class="member-expected-role">Expected role: ${first ? first.emoji + ' ' + first.name : '—'}</div>`;
                     })() : ''}
-                    <div class="member-roles">
-                        ${(member.roleTagIds || []).map(id => {
-                            const tag = findRole(id);
-                            return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
-                        }).join('')}
-                    </div>
-                    <div class="member-interests">
-                        ${(member.interestTagIds || []).filter(id => id !== 'others').map(id => {
-                            const tag = findInterest(id);
-                            return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
-                        }).join('')}
-                        ${member.customInterest ? `<span class="member-tag">✏️ ${member.customInterest}</span>` : ''}
-                    </div>
+                    ${(member.interestTagIds && member.interestTagIds.length > 0) ? (() => {
+                        const interestNames = (member.interestTagIds || []).filter(id => id !== 'others').map(id => findInterest(id)).filter(Boolean).map(t => t.emoji + ' ' + t.name);
+                        if (member.customInterest) interestNames.push('✏️ ' + member.customInterest);
+                        return `<div class="member-interest-realm">Interest: ${interestNames.length ? interestNames.join(', ') : '—'}</div>`;
+                    })() : ''}
                     ${member.messageToTeam ? `<p class="member-message">"${member.messageToTeam}"</p>` : ''}
                 </div>
             `;
