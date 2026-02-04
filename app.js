@@ -717,6 +717,80 @@ function initEventListeners() {
         });
     });
 
+    // ============================================
+    // INSTRUCTOR RE-LOGIN
+    // ============================================
+
+    // Go to instructor re-login
+    document.getElementById('btn-instructor-relogin').addEventListener('click', (e) => {
+        e.preventDefault();
+        showScreen('instructor-relogin');
+    });
+
+    // Re-login form inputs
+    const reloginCodeInput = document.getElementById('relogin-code');
+    const reloginNameInput = document.getElementById('relogin-name');
+    const reloginPasswordInput = document.getElementById('relogin-password');
+
+    function validateReloginForm() {
+        const code = reloginCodeInput.value.trim();
+        const name = reloginNameInput.value.trim();
+        const password = reloginPasswordInput.value.trim();
+        document.getElementById('btn-instructor-login').disabled = code.length !== 6 || !name || !password;
+    }
+
+    reloginCodeInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.toUpperCase();
+        validateReloginForm();
+    });
+    reloginNameInput.addEventListener('input', validateReloginForm);
+    reloginPasswordInput.addEventListener('input', validateReloginForm);
+
+    // Instructor login button
+    document.getElementById('btn-instructor-login').addEventListener('click', async () => {
+        const code = reloginCodeInput.value.trim().toUpperCase();
+        const name = reloginNameInput.value.trim();
+        const password = reloginPasswordInput.value.trim();
+
+        try {
+            const session = await getSessionByCode(code);
+
+            if (!session) {
+                document.getElementById('relogin-error').textContent = 'Session not found. Check the code.';
+                return;
+            }
+
+            // Check credentials
+            if (session.instructorName !== name || session.instructorPassword !== password) {
+                document.getElementById('relogin-error').textContent = 'Invalid name or password.';
+                return;
+            }
+
+            // Success! Enter as instructor
+            state.currentSession = session;
+            state.isInstructor = true;
+
+            // Listen for real-time updates
+            listenToSession(code, (updatedSession) => {
+                state.currentSession = updatedSession;
+                if (state.currentScreen === 'instructor-dashboard') {
+                    renderDashboard();
+                }
+            });
+
+            // Clear form
+            reloginCodeInput.value = '';
+            reloginNameInput.value = '';
+            reloginPasswordInput.value = '';
+            document.getElementById('relogin-error').textContent = '';
+
+            renderDashboard();
+            showScreen('instructor-dashboard');
+        } catch (err) {
+            document.getElementById('relogin-error').textContent = 'Error: ' + err.message;
+        }
+    });
+
     // Join session form validation
     const studentNameInput = document.getElementById('student-name');
     const studentPasswordInput = document.getElementById('student-password');
@@ -838,6 +912,8 @@ function initEventListeners() {
     // Create session
     document.getElementById('btn-create-session').addEventListener('click', async () => {
         const sessionName = sessionNameInput.value.trim();
+        const instructorName = instructorNameInput.value.trim();
+        const instructorPassword = instructorPasswordInput.value.trim();
         const code = generateSessionCode();
         const roleWeight = parseInt(weightRoleSlider.value);
         const teamSize = parseInt(document.getElementById('team-size').value);
@@ -846,6 +922,8 @@ function initEventListeners() {
             id: generateId(),
             code: code,
             name: sessionName,
+            instructorName: instructorName,
+            instructorPassword: instructorPassword,
             teamSize: teamSize,
             weightRole: roleWeight,
             weightInterest: 100 - roleWeight,
