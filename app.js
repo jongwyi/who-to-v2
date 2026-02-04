@@ -54,6 +54,71 @@ function slugify(text) {
     return String(text).toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || 'tag';
 }
 
+// Initialize create-session tag rows from defaults (call when showing create-session)
+function initCreateSessionTags() {
+    const roleList = document.getElementById('create-role-tags-list');
+    const interestList = document.getElementById('create-interest-tags-list');
+    if (!roleList || !interestList) return;
+    roleList.innerHTML = '';
+    interestList.innerHTML = '';
+    ROLE_TAGS.forEach(t => appendCreateRoleTagRow(t.emoji, t.name));
+    INTEREST_TAGS.forEach(t => appendCreateInterestTagRow(t.emoji, t.name));
+}
+
+function appendCreateRoleTagRow(emoji = '', name = '') {
+    const list = document.getElementById('create-role-tags-list');
+    const row = document.createElement('div');
+    row.className = 'create-tag-row';
+    row.innerHTML = `
+        <input type="text" class="form-input create-tag-emoji" value="${emoji}" placeholder="💻" maxlength="4">
+        <input type="text" class="form-input create-tag-name" value="${name}" placeholder="Role name">
+        <button type="button" class="btn btn-ghost btn-small btn-remove-tag" data-list="role" aria-label="Remove">✕</button>
+    `;
+    list.appendChild(row);
+}
+
+function appendCreateInterestTagRow(emoji = '', name = '') {
+    const list = document.getElementById('create-interest-tags-list');
+    const row = document.createElement('div');
+    row.className = 'create-tag-row';
+    row.innerHTML = `
+        <input type="text" class="form-input create-tag-emoji" value="${emoji}" placeholder="🏥" maxlength="4">
+        <input type="text" class="form-input create-tag-name" value="${name}" placeholder="Interest name">
+        <button type="button" class="btn btn-ghost btn-small btn-remove-tag" data-list="interest" aria-label="Remove">✕</button>
+    `;
+    list.appendChild(row);
+}
+
+function getCreateRoleTags() {
+    const list = document.getElementById('create-role-tags-list');
+    if (!list) return [];
+    const seen = {};
+    return [...list.querySelectorAll('.create-tag-row')].map(row => {
+        const emoji = (row.querySelector('.create-tag-emoji')?.value || '').trim() || '•';
+        const name = (row.querySelector('.create-tag-name')?.value || '').trim();
+        if (!name) return null;
+        let id = slugify(name);
+        if (seen[id]) { let n = 1; while (seen[id + '-' + n]) n++; id = id + '-' + n; }
+        seen[id] = true;
+        return { id, name, emoji };
+    }).filter(Boolean);
+}
+
+function getCreateInterestTags() {
+    const list = document.getElementById('create-interest-tags-list');
+    if (!list) return [];
+    const seen = {};
+    return [...list.querySelectorAll('.create-tag-row')].map(row => {
+        const emoji = (row.querySelector('.create-tag-emoji')?.value || '').trim() || '•';
+        const name = (row.querySelector('.create-tag-name')?.value || '').trim();
+        if (!name) return null;
+        let id = slugify(name);
+        if (seen[id]) { let n = 1; while (seen[id + '-' + n]) n++; id = id + '-' + n; }
+        seen[id] = true;
+        return { id, name, emoji };
+    }).filter(Boolean);
+}
+
 // ============================================
 // APPLICATION STATE
 // ============================================
@@ -329,6 +394,22 @@ function renderRoleTags() {
     `}).join('');
 }
 
+function updateRolePrioritySummary() {
+    const el = document.getElementById('role-priority-summary');
+    if (!el) return;
+    const session = state.currentSession;
+    const roleTags = getRoleTags(session);
+    if (state.selectedRoles.length === 0) {
+        el.textContent = '';
+        return;
+    }
+    const labels = state.selectedRoles.map((id, i) => {
+        const tag = roleTags.find(t => t.id === id);
+        return tag ? `${i === 0 ? '1st' : '2nd'}: ${tag.emoji} ${tag.name}` : '';
+    }).filter(Boolean);
+    el.textContent = labels.length ? 'Your priorities: ' + labels.join(' → ') : '';
+}
+
 function renderInterestTags() {
     const session = state.currentSession;
     const tags = getInterestTags(session);
@@ -363,6 +444,7 @@ function renderProfileStep(step) {
     const nextBtn = document.getElementById('btn-profile-next');
     nextBtn.textContent = step === 3 ? 'Submit ✓' : 'Next →';
 
+    if (step === 1) updateRolePrioritySummary();
     validateProfileStep();
 }
 
@@ -758,6 +840,7 @@ function initEventListeners() {
 
     // Landing: Go to create
     document.getElementById('btn-go-create').addEventListener('click', () => {
+        initCreateSessionTags();
         showScreen('create-session');
     });
 
@@ -944,12 +1027,39 @@ function initEventListeners() {
         const sessionName = sessionNameInput.value.trim();
         const name = instructorNameInput.value.trim();
         const password = instructorPasswordInput.value.trim();
-        document.getElementById('btn-create-session').disabled = !sessionName || !name || !password;
+        const roleTags = getCreateRoleTags();
+        const interestTags = getCreateInterestTags();
+        const hasTags = roleTags.length > 0 && interestTags.length > 0;
+        document.getElementById('btn-create-session').disabled = !sessionName || !name || !password || !hasTags;
     }
 
     sessionNameInput.addEventListener('input', validateCreateForm);
     instructorNameInput.addEventListener('input', validateCreateForm);
     instructorPasswordInput.addEventListener('input', validateCreateForm);
+
+    // Create-session: Add role / Add interest
+    document.getElementById('btn-add-role-tag').addEventListener('click', () => {
+        appendCreateRoleTagRow('', '');
+        validateCreateForm();
+    });
+    document.getElementById('btn-add-interest-tag').addEventListener('click', () => {
+        appendCreateInterestTagRow('', '');
+        validateCreateForm();
+    });
+    document.getElementById('create-role-tags-list').addEventListener('input', validateCreateForm);
+    document.getElementById('create-interest-tags-list').addEventListener('input', validateCreateForm);
+    document.getElementById('create-role-tags-list').addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-remove-tag')) {
+            e.target.closest('.create-tag-row')?.remove();
+            validateCreateForm();
+        }
+    });
+    document.getElementById('create-interest-tags-list').addEventListener('click', (e) => {
+        if (e.target.classList.contains('btn-remove-tag')) {
+            e.target.closest('.create-tag-row')?.remove();
+            validateCreateForm();
+        }
+    });
 
     // Weight slider
     const weightRoleSlider = document.getElementById('weight-role');
@@ -968,6 +1078,13 @@ function initEventListeners() {
         const code = generateSessionCode();
         const roleWeight = parseInt(weightRoleSlider.value);
         const teamSize = parseInt(document.getElementById('team-size').value);
+        const roleTags = getCreateRoleTags();
+        const interestTags = getCreateInterestTags();
+
+        if (roleTags.length === 0 || interestTags.length === 0) {
+            document.getElementById('create-error').textContent = 'Add at least one role tag and one interest tag.';
+            return;
+        }
 
         const session = {
             id: generateId(),
@@ -980,9 +1097,12 @@ function initEventListeners() {
             weightInterest: 100 - roleWeight,
             status: 'open',
             students: {},
-            teams: {}
+            teams: {},
+            roleTags: roleTags,
+            interestTags: interestTags
         };
 
+        document.getElementById('create-error').textContent = '';
         try {
             await createSessionInDB(session);
             state.currentSession = session;
@@ -1003,7 +1123,7 @@ function initEventListeners() {
         }
     });
 
-    // Tag selection
+    // Tag selection (roles: exactly 2, order = priority)
     document.getElementById('role-tags').addEventListener('click', (e) => {
         const tagItem = e.target.closest('.tag-item');
         if (!tagItem) return;
@@ -1012,12 +1132,18 @@ function initEventListeners() {
         const index = state.selectedRoles.indexOf(tagId);
 
         if (index === -1) {
-            state.selectedRoles.push(tagId);
+            if (state.selectedRoles.length >= 2) {
+                // Replace second priority with this one
+                state.selectedRoles[1] = tagId;
+            } else {
+                state.selectedRoles.push(tagId);
+            }
         } else {
             state.selectedRoles.splice(index, 1);
         }
 
-        tagItem.classList.toggle('selected');
+        renderRoleTags();
+        updateRolePrioritySummary();
         validateProfileStep();
     });
 
