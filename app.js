@@ -491,7 +491,7 @@ function renderTeams(teams, showAll = false) {
             ${(team.members || []).map(member => `
                 <div class="member-card">
                     <div class="member-name">
-                        👤 ${member.name}
+                        ${member.emoji || '👤'} ${member.name}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
                     <div class="member-roles">
@@ -963,6 +963,11 @@ function initEventListeners() {
                     document.getElementById('join-error').textContent = 'Wrong password.';
                     return;
                 }
+                const emojiInput = (document.getElementById('student-emoji')?.value || '').trim().slice(0, 4);
+                if (emojiInput) {
+                    student.emoji = emojiInput;
+                    await saveStudentInDB(code, student);
+                }
                 state.currentStudent = student;
 
                 if (student.roleTagIds && student.roleTagIds.length > 0) {
@@ -994,9 +999,11 @@ function initEventListeners() {
                 }
             } else {
                 // New student
+                const emojiInput = (document.getElementById('student-emoji')?.value || '').trim().slice(0, 4);
                 student = {
                     id: generateId(),
                     name: name,
+                    emoji: emojiInput || '',
                     password: password,
                     roleTagIds: [],
                     interestTagIds: [],
@@ -1074,6 +1081,7 @@ function initEventListeners() {
     document.getElementById('btn-create-session').addEventListener('click', async () => {
         const sessionName = sessionNameInput.value.trim();
         const instructorName = instructorNameInput.value.trim();
+        const instructorEmoji = (document.getElementById('instructor-emoji')?.value || '').trim().slice(0, 4);
         const instructorPassword = instructorPasswordInput.value.trim();
         const code = generateSessionCode();
         const roleWeight = parseInt(weightRoleSlider.value);
@@ -1091,6 +1099,7 @@ function initEventListeners() {
             code: code,
             name: sessionName,
             instructorName: instructorName,
+            instructorEmoji: instructorEmoji || '',
             instructorPassword: instructorPassword,
             teamSize: teamSize,
             weightRole: roleWeight,
