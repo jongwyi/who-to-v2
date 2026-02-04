@@ -515,14 +515,14 @@ body {
     border-left: 3px solid var(--accent-primary);
 }
 
-.member-expected-role,
+.member-role-line,
 .member-interest-realm {
     font-size: 0.9rem;
     color: var(--text-secondary);
     margin-bottom: var(--spacing-xs);
 }
 
-.member-expected-role {
+.member-role-line {
     font-weight: 500;
     color: var(--text-primary);
 }
