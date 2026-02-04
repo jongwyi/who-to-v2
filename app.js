@@ -930,11 +930,16 @@ function initEventListeners() {
             state.currentSession = session;
             state.isInstructor = true;
 
-            // Listen for real-time updates
+            // Listen for real-time updates (incl. late joiners → refresh results if on results screen)
             listenToSession(code, (updatedSession) => {
                 state.currentSession = updatedSession;
                 if (state.currentScreen === 'instructor-dashboard') {
                     renderDashboard();
+                } else if (state.currentScreen === 'results') {
+                    const teams = Object.values(updatedSession.teams || {});
+                    document.getElementById('results-title').textContent = 'All Teams';
+                    if (document.getElementById('btn-back-dashboard')) document.getElementById('btn-back-dashboard').style.display = 'block';
+                    renderTeams(teams, true);
                 }
             });
 
@@ -1143,11 +1148,16 @@ function initEventListeners() {
             state.currentSession = session;
             state.isInstructor = true;
 
-            // Listen for real-time updates
+            // Listen for real-time updates (incl. late joiners → refresh results if on results screen)
             listenToSession(code, (updatedSession) => {
                 state.currentSession = updatedSession;
                 if (state.currentScreen === 'instructor-dashboard') {
                     renderDashboard();
+                } else if (state.currentScreen === 'results') {
+                    const teams = Object.values(updatedSession.teams || {});
+                    document.getElementById('results-title').textContent = 'All Teams';
+                    if (document.getElementById('btn-back-dashboard')) document.getElementById('btn-back-dashboard').style.display = 'block';
+                    renderTeams(teams, true);
                 }
             });
 
@@ -1239,10 +1249,26 @@ function initEventListeners() {
                     const myTeam = await assignLateJoinerToTeam(session.code, session, student);
                     if (myTeam) {
                         state.currentStudent = student;
-                        state.currentSession = { ...session, teams: { ...session.teams, [myTeam.id]: myTeam } };
+                        // Refetch session from Firebase so UI shows the saved state (instructor + this student see same data)
+                        const updatedSession = await getSessionByCode(session.code);
+                        state.currentSession = updatedSession;
+                        const teams = Object.values(updatedSession.teams || {});
+                        const myTeamFromSession = teams.find(t => t.memberIds && t.memberIds.includes(student.id));
                         document.getElementById('results-title').textContent = '🎉 Your Team';
-                        renderTeams([myTeam]);
+                        renderTeams(myTeamFromSession ? [myTeamFromSession] : [myTeam]);
                         showScreen('results');
+                        // Keep results in sync when session updates (e.g. instructor viewing)
+                        listenToSession(session.code, (nextSession) => {
+                            state.currentSession = nextSession;
+                            if (state.currentScreen === 'results' && state.currentStudent) {
+                                const nextTeams = Object.values(nextSession.teams || {});
+                                const nextMyTeam = nextTeams.find(t => t.memberIds && t.memberIds.includes(state.currentStudent.id));
+                                if (nextMyTeam) {
+                                    document.getElementById('results-title').textContent = '🎉 Your Team';
+                                    renderTeams([nextMyTeam]);
+                                }
+                            }
+                        });
                     } else {
                         showScreen('waiting');
                     }
