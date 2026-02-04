@@ -160,42 +160,53 @@ function generateSessionCode() {
 // FIREBASE DATABASE FUNCTIONS
 // ============================================
 
+// Normalize session code for Firebase paths (always uppercase so read/write match)
+function sessionCodeRef(code) {
+    return (code || '').toString().trim().toUpperCase();
+}
+
 // Create a new session in Firebase
 async function createSessionInDB(session) {
-    await db.ref('sessions/' + session.code).set(session);
+    const ref = sessionCodeRef(session.code);
+    await db.ref('sessions/' + ref).set(session);
     return session;
 }
 
 // Get session by code from Firebase
 async function getSessionByCode(code) {
-    const snapshot = await db.ref('sessions/' + code.toUpperCase()).once('value');
+    const ref = sessionCodeRef(code);
+    const snapshot = await db.ref('sessions/' + ref).once('value');
     return snapshot.val();
 }
 
 // Update session in Firebase
 async function updateSessionInDB(code, updates) {
-    await db.ref('sessions/' + code).update(updates);
+    await db.ref('sessions/' + sessionCodeRef(code)).update(updates);
 }
 
 // Add or update student in session
 async function saveStudentInDB(code, student) {
-    await db.ref('sessions/' + code + '/students/' + student.id).set(student);
+    const ref = sessionCodeRef(code);
+    await db.ref('sessions/' + ref + '/students/' + student.id).set(student);
 }
 
 // Get student from session
 async function getStudentFromDB(code, studentId) {
-    const snapshot = await db.ref('sessions/' + code + '/students/' + studentId).once('value');
+    const ref = sessionCodeRef(code);
+    const snapshot = await db.ref('sessions/' + ref + '/students/' + studentId).once('value');
     return snapshot.val();
 }
 
 // Save teams to session
 async function saveTeamsInDB(code, teams) {
-    await db.ref('sessions/' + code + '/teams').set(teams);
-    await db.ref('sessions/' + code + '/status').set('published');
+    const ref = sessionCodeRef(code);
+    await db.ref('sessions/' + ref + '/teams').set(teams);
+    await db.ref('sessions/' + ref + '/status').set('published');
 }
 
 // Assign a late-joining student to one existing team (when teams already published)
 async function assignLateJoinerToTeam(code, session, student) {
+    const ref = sessionCodeRef(code);
     const teams = session.teams ? Object.values(session.teams) : [];
     if (teams.length === 0) return null;
     // Pick team with fewest members (balance size)
@@ -210,15 +221,16 @@ async function assignLateJoinerToTeam(code, session, student) {
         members,
         newMemberIds
     };
-    await db.ref('sessions/' + code + '/teams/' + team.id).set(updatedTeam);
+    await db.ref('sessions/' + ref + '/teams/' + team.id).set(updatedTeam);
     student.teamId = team.id;
-    await saveStudentInDB(code, student);
+    await saveStudentInDB(ref, student);
     return updatedTeam;
 }
 
 // Listen for session changes (real-time updates)
 function listenToSession(code, callback) {
-    db.ref('sessions/' + code).on('value', (snapshot) => {
+    const ref = sessionCodeRef(code);
+    db.ref('sessions/' + ref).on('value', (snapshot) => {
         const session = snapshot.val();
         if (session) {
             callback(session);
@@ -1249,7 +1261,8 @@ function initEventListeners() {
                     const myTeam = await assignLateJoinerToTeam(session.code, session, student);
                     if (myTeam) {
                         state.currentStudent = student;
-                        // Refetch session from Firebase so UI shows the saved state (instructor + this student see same data)
+                        // Brief delay so Firebase has time to persist, then refetch so UI shows saved state
+                        await new Promise(r => setTimeout(r, 350));
                         const updatedSession = await getSessionByCode(session.code);
                         state.currentSession = updatedSession;
                         const teams = Object.values(updatedSession.teams || {});
