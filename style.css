@@ -259,6 +259,46 @@ body {
     font-size: var(--font-size-sm);
 }
 
+/* Create-session tag rows (instructor custom tags) */
+.create-tags-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.create-tag-row {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.create-tag-row input.create-tag-emoji {
+    width: 52px;
+    text-align: center;
+    font-size: 1.25rem;
+}
+
+.create-tag-row input.create-tag-name {
+    flex: 1;
+}
+
+.btn-small {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-sm);
+}
+
+/* Role priority labels (student: 1st / 2nd) */
+.tag-item .tag-priority {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    background: rgba(99, 102, 241, 0.25);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
 /* Steps */
 .steps {
     display: flex;
@@ -404,6 +444,40 @@ body {
     font-size: var(--font-size-sm);
 }
 
+/* Team-level shared interests (intersection) */
+.team-shared-interests {
+    padding: var(--spacing-md);
+    margin-bottom: var(--spacing-md);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.08) 100%);
+    border: 1px solid rgba(99, 102, 241, 0.35);
+    border-radius: var(--radius-md);
+}
+
+.team-shared-label {
+    display: block;
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    color: var(--accent-primary);
+    margin-bottom: var(--spacing-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.team-shared-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.team-shared-tag {
+    padding: 6px 12px;
+    background: var(--accent-primary);
+    color: white;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+}
+
 .member-card {
     padding: var(--spacing-md);
     background: var(--bg-secondary);
@@ -414,6 +488,20 @@ body {
 .member-name {
     font-weight: 500;
     margin-bottom: var(--spacing-xs);
+}
+
+.member-roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
+}
+
+.member-interests {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+    margin-bottom: var(--spacing-sm);
 }
 
 .member-tags {

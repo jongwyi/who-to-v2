@@ -146,6 +146,16 @@
                         <input type="range" id="weight-interest" min="0" max="100" value="50" disabled>
                     </div>
 
+                    <h4 class="section-title">Role Tags</h4>
+                    <p class="hint-text">Define the roles students can pick from (they will choose 2). Add, edit, or remove rows.</p>
+                    <div id="create-role-tags-list" class="create-tags-list"></div>
+                    <button type="button" id="btn-add-role-tag" class="btn btn-ghost btn-small">+ Add role</button>
+
+                    <h4 class="section-title" style="margin-top: 1.25rem;">Interest Tags</h4>
+                    <p class="hint-text">Define the interest categories students can pick from. Add, edit, or remove rows.</p>
+                    <div id="create-interest-tags-list" class="create-tags-list"></div>
+                    <button type="button" id="btn-add-interest-tag" class="btn btn-ghost btn-small">+ Add interest</button>
+
                     <p id="create-error" class="error-text"></p>
                     <div class="nav-buttons">
                         <button class="btn btn-ghost" data-go="landing">← Back</button>
@@ -170,8 +180,10 @@
                 <div class="card">
                     <!-- Step 1: Roles -->
                     <div id="profile-step-1" class="profile-step active">
-                        <p class="step-instruction">What skills can you bring to the team? (Select all that apply)</p>
+                        <p class="step-instruction">Pick exactly two roles. The first you choose is your <strong>first priority</strong>, the second is your <strong>second priority</strong>.</p>
+                        <p class="hint-text" style="margin-bottom: 1rem;">Order of selection sets your priorities. You can change your mind by clicking a selected role to remove it, then pick again.</p>
                         <div class="tag-grid" id="role-tags"></div>
+                        <p id="role-priority-summary" class="hint-text" style="margin-top: 0.75rem; min-height: 1.5em;"></p>
                     </div>
 
                     <!-- Step 2: Interests -->

@@ -41,6 +41,19 @@ const INTEREST_TAGS = [
     { id: 'others', name: 'Others', emoji: '✏️' }
 ];
 
+// Resolve role/interest tags for a session (instructor-defined or defaults)
+function getRoleTags(session) {
+    if (session && session.roleTags && session.roleTags.length > 0) return session.roleTags;
+    return ROLE_TAGS;
+}
+function getInterestTags(session) {
+    if (session && session.interestTags && session.interestTags.length > 0) return session.interestTags;
+    return INTEREST_TAGS;
+}
+function slugify(text) {
+    return String(text).toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') || 'tag';
+}
+
 // ============================================
 // APPLICATION STATE
 // ============================================
@@ -300,19 +313,27 @@ function runMatching(session) {
 // ============================================
 
 function renderRoleTags() {
+    const session = state.currentSession;
+    const tags = getRoleTags(session);
     const container = document.getElementById('role-tags');
-    container.innerHTML = ROLE_TAGS.map(tag => `
+    container.innerHTML = tags.map(tag => {
+        const idx = state.selectedRoles.indexOf(tag.id);
+        const priorityLabel = idx >= 0 ? `<span class="tag-priority">${idx === 0 ? '1st' : '2nd'}</span>` : '';
+        return `
         <div class="tag-item ${state.selectedRoles.includes(tag.id) ? 'selected' : ''}" 
              data-tag-id="${tag.id}" data-tag-type="role">
             <span class="tag-emoji">${tag.emoji}</span>
             <span class="tag-name">${tag.name}</span>
+            ${priorityLabel}
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function renderInterestTags() {
+    const session = state.currentSession;
+    const tags = getInterestTags(session);
     const container = document.getElementById('interest-tags');
-    container.innerHTML = INTEREST_TAGS.map(tag => `
+    container.innerHTML = tags.map(tag => `
         <div class="tag-item ${state.selectedInterests.includes(tag.id) ? 'selected' : ''}" 
              data-tag-id="${tag.id}" data-tag-type="interest">
             <span class="tag-emoji">${tag.emoji}</span>
@@ -345,33 +366,61 @@ function renderProfileStep(step) {
     validateProfileStep();
 }
 
+function getTeamSharedInterestIds(team) {
+    const members = team.members || [];
+    if (members.length === 0) return [];
+    const allInterestSets = members.map(m => new Set((m.interestTagIds || []).filter(id => id !== 'others')));
+    const firstSet = allInterestSets[0];
+    return [...firstSet].filter(id => allInterestSets.every(s => s.has(id)));
+}
+
 function renderTeams(teams, showAll = false) {
     const container = document.getElementById('teams-container');
+    const session = state.currentSession;
+    const roleTags = getRoleTags(session);
+    const interestTags = getInterestTags(session);
+    const findRole = (id) => roleTags.find(t => t.id === id);
+    const findInterest = (id) => interestTags.find(t => t.id === id);
 
     if (!teams || teams.length === 0) {
         container.innerHTML = '<p style="color: var(--text-secondary);">No teams yet.</p>';
         return;
     }
 
-    container.innerHTML = teams.map(team => `
+    container.innerHTML = teams.map(team => {
+        const sharedInterestIds = getTeamSharedInterestIds(team);
+        return `
         <div class="team-card">
             <div class="team-header">
                 <h3 class="team-name">🎯 ${team.name}</h3>
                 <span class="team-score">Cohesion: ${(team.cohesionScore * 100).toFixed(0)}%</span>
             </div>
+            ${sharedInterestIds.length > 0 ? `
+            <div class="team-shared-interests">
+                <span class="team-shared-label">All fond of:</span>
+                <div class="team-shared-tags">
+                    ${sharedInterestIds.map(id => {
+                        const tag = findInterest(id);
+                        return tag ? `<span class="team-shared-tag">${tag.emoji} ${tag.name}</span>` : '';
+                    }).join('')}
+                </div>
+            </div>
+            ` : ''}
             ${(team.members || []).map(member => `
                 <div class="member-card">
                     <div class="member-name">
                         👤 ${member.name}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
-                    <div class="member-tags">
+                    <div class="member-roles">
                         ${(member.roleTagIds || []).map(id => {
-        const tag = ROLE_TAGS.find(t => t.id === id);
+        const tag = findRole(id);
         return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
     }).join('')}
+                    </div>
+                    <div class="member-interests">
                         ${(member.interestTagIds || []).filter(id => id !== 'others').map(id => {
-        const tag = INTEREST_TAGS.find(t => t.id === id);
+        const tag = findInterest(id);
         return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
     }).join('')}
                         ${member.customInterest ? `<span class="member-tag">✏️ ${member.customInterest}</span>` : ''}
@@ -380,7 +429,8 @@ function renderTeams(teams, showAll = false) {
                 </div>
             `).join('')}
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function renderDashboard() {
@@ -426,20 +476,22 @@ function generateDummyStudents(count) {
     for (let i = 0; i < count; i++) {
         const name = FIRST_NAMES[i % FIRST_NAMES.length] + (Math.floor(i / FIRST_NAMES.length) || '');
 
-        // Random roles (1-3)
-        const numRoles = Math.floor(Math.random() * 3) + 1;
+        const roleTags = getRoleTags(state.currentSession);
+        const interestTags = getInterestTags(state.currentSession);
+        const availableRoles = [...roleTags.map(t => t.id)];
+        const availableInterests = interestTags.filter(t => t.id !== 'others').map(t => t.id);
+
+        // Exactly 2 roles (priority order)
         const roleTagIds = [];
-        const availableRoles = [...ROLE_TAGS.map(t => t.id)];
-        for (let r = 0; r < numRoles; r++) {
+        for (let r = 0; r < 2 && availableRoles.length > 0; r++) {
             const idx = Math.floor(Math.random() * availableRoles.length);
             roleTagIds.push(availableRoles.splice(idx, 1)[0]);
         }
 
         // Random interests (1-3)
-        const numInterests = Math.floor(Math.random() * 3) + 1;
+        const numInterests = Math.min(3, Math.floor(Math.random() * 3) + 1, availableInterests.length);
         const interestTagIds = [];
-        const availableInterests = INTEREST_TAGS.filter(t => t.id !== 'others').map(t => t.id);
-        for (let r = 0; r < numInterests; r++) {
+        for (let r = 0; r < numInterests && availableInterests.length > 0; r++) {
             const idx = Math.floor(Math.random() * availableInterests.length);
             interestTagIds.push(availableInterests.splice(idx, 1)[0]);
         }
@@ -494,12 +546,11 @@ function balancedTeamFormation(students, teamSize, matrix) {
     const n = students.length;
     const numTeams = Math.ceil(n / teamSize);
 
-    // Group students by their primary role
+    // Group students by their primary role (derive from students' roleTagIds)
     const roleGroups = {};
-    ROLE_TAGS.forEach(tag => { roleGroups[tag.id] = []; });
-
     students.forEach((student, idx) => {
-        const primaryRole = student.roleTagIds[0] || 'engineer';
+        const primaryRole = (student.roleTagIds && student.roleTagIds[0]) || 'unknown';
+        if (!roleGroups[primaryRole]) roleGroups[primaryRole] = [];
         roleGroups[primaryRole].push(idx);
     });
 
@@ -672,7 +723,7 @@ function validateProfileStep() {
     let valid = false;
 
     if (state.profileStep === 1) {
-        valid = state.selectedRoles.length > 0;
+        valid = state.selectedRoles.length === 2;
     } else if (state.profileStep === 2) {
         valid = state.selectedInterests.length > 0;
         if (state.selectedInterests.includes('others')) {
