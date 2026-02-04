@@ -1,13 +1,10 @@
-# Who-To V2: Product Requirements Document
+# Who-To V2: Final MVP PRD
 
 ## Overview
 
-**Who-To** is a team matching application for classrooms and workshops. It helps instructors automatically form balanced teams based on students' skills, working styles (vibes), and goals.
+**Who-To** is a team matching app for classrooms and workshops. Instructors create sessions, students join and submit profiles, then teams are automatically formed based on skill diversity and interest alignment.
 
-**V2 Goal**: Rebuild as plain HTML/CSS/JS for:
-- ✅ GitHub-uploadable (< 100KB total, no `node_modules`)
-- ✅ Full codebase transparency and control
-- ✅ Easy collaboration without build steps
+**Tech Stack**: Plain HTML + CSS + JavaScript (no frameworks, no build step)
 
 ---
 
@@ -15,8 +12,8 @@
 
 | Role | Description |
 |------|-------------|
-| **Instructor** | Creates sessions, configures matching weights, runs matching, views all teams |
-| **Student** | Joins sessions, submits profile (skills + vibes + goals), views their assigned team |
+| **Instructor** | Creates session, configures weights, runs matching, views all teams |
+| **Student** | Joins session, selects tags, writes message, views assigned team |
 
 ---
 
@@ -26,79 +23,72 @@
 
 ```mermaid
 flowchart LR
-    A[Landing Page] --> B[Click 'Create Session']
-    B --> C[Fill: Session Name, Name, Password, Team Size, Weights]
-    C --> D[Submit → Dashboard]
-    D --> E[Share 6-char Code with Students]
-    E --> F[Wait for Students to Join]
-    F --> G[Click 'Run Matching']
-    G --> H[View All Teams + Cohesion Scores]
+    A[Landing] --> B[Create Session Form]
+    B --> C[Set Name, Team Size, Weights]
+    C --> D[Dashboard with 6-char Code]
+    D --> E[Wait for Students]
+    E --> F[Run Matching]
+    F --> G[View All Teams]
 ```
 
-### Flow 2: Student Joins & Submits Profile
+### Flow 2: Student Joins & Submits
 
 ```mermaid
 flowchart LR
-    A[Landing Page] --> B[Enter 6-char Session Code]
-    B --> C[Enter Name + Password]
-    C --> D[Step 1: Select Role Tags]
-    D --> E[Step 2: Select Vibe Tags]
-    E --> F[Step 3: Write Goal Statement]
-    F --> G[Submit → Waiting Screen]
-    G --> H[Instructor Runs Matching]
-    H --> I[View Your Team]
-```
-
-### Flow 3: Returning Student
-
-```mermaid
-flowchart LR
-    A[Landing Page] --> B[Enter Session Code]
-    B --> C[Enter Same Name + Password]
-    C --> D{Already Submitted?}
-    D -->|Yes, Published| E[View Team Results]
-    D -->|Yes, Waiting| F[Waiting Screen]
-    D -->|No| G[Continue Profile Input]
+    A[Landing] --> B[Enter Session Code]
+    B --> C[Name + Password]
+    C --> D[Select Role Tags]
+    D --> E[Select Sub-interest Tags]
+    E --> F[Write Message to Teammates]
+    F --> G[Submit → Wait]
+    G --> H[View Team Results]
 ```
 
 ---
 
-## Features
+## Tags (Final)
 
-### Core Features (V2 MVP)
+### Role Tags (5 items)
+| ID | Name | Emoji |
+|----|------|-------|
+| `engineer` | Engineer | 💻 |
+| `researcher` | Researcher | 🔬 |
+| `data-analyst` | Data Analyst | 📊 |
+| `designer` | Designer | 🎨 |
+| `speech-giver` | Speech Giver | 🎤 |
 
-| Feature | Description |
-|---------|-------------|
-| **Session Creation** | Instructor creates a session with name, team size (2-10), and matching weights |
-| **Session Code** | 6-character sharable code (e.g., `AB3D7K`) |
-| **Student Registration** | Name + simple password for re-entry |
-| **Role Tags Selection** | 8 predefined skills: Developer, Designer, Data Analyst, Presenter, Writer, Researcher, PM, Marketing |
-| **Vibe Tags Selection** | 8 work style preferences: Night Owl, Morning Person, Async, Leader, Collaborator, Deep Focus, Flexible, Structured |
-| **Goal Statement** | Free-text input describing project goals |
-| **Matching Algorithm** | Weighted scoring: Role diversity + Vibe similarity + Goal alignment |
-| **Team Display** | Show team name, members, tags, goals, cohesion score |
+### Sub-interest Tags (5 items + custom)
+| ID | Name | Emoji |
+|----|------|-------|
+| `health-care` | Health Care | 🏥 |
+| `edu-tech` | Edu Tech | 📚 |
+| `fin-tech` | Fin Tech | 💰 |
+| `social-impact` | Social Impact | 🌍 |
+| `others` | Others | ✏️ |
 
-### V1 Features to Defer (Future)
-
-| Feature | Reason to Defer |
-|---------|-----------------|
-| 3D Visualization | Requires Three.js, adds complexity |
-| Goal Embeddings | Requires API call for semantic similarity |
-| Polling/Real-time | Keep it simple, use manual refresh |
+> When user selects "Others", a text input appears for custom entry.
 
 ---
 
-## Screens (8 Views)
+## Matching Algorithm (Simplified)
 
-| Screen | Description |
-|--------|-------------|
-| `landing` | Session code input + Create Session button |
-| `join-session` | Name + Password form for students |
-| `create-session` | Full instructor form with weights |
-| `profile-input` | Multi-step form (Roles → Vibes → Goals) |
-| `waiting` | "Waiting for instructor..." with refresh button |
-| `instructor-dashboard` | Show session code, status, Run Matching button |
-| `results` | Display teams and members |
+### Inputs Used for Matching
+- ✅ **Role Tags** → Diversity scoring (different roles = higher score)
+- ✅ **Sub-interest Tags** → Similarity scoring (same interests = higher score)
+- ❌ **Message to Teammates** → NOT used in matching (display only)
+
+### Pairwise Score Formula
+```
+score = (weight_role × role_diversity) + (weight_interest × interest_similarity)
+
+role_diversity = 1 - jaccard_similarity(roleA, roleB)
+interest_similarity = jaccard_similarity(interestA, interestB)
+```
+
+### Team Formation
+1. Build NxN compatibility matrix
+2. Greedy: Pick seed, add best-compatible members
+3. Optimize: Random swaps to improve total score
 
 ---
 
@@ -111,12 +101,11 @@ flowchart LR
   code: "AB3D7K",
   name: "CS101 Spring 2024",
   teamSize: 4,
-  weightRole: 40,
-  weightVibe: 30,
-  weightGoal: 30,
+  weightRole: 50,      // percentage
+  weightInterest: 50,  // percentage (must sum to 100)
   status: "open" | "published",
-  students: [...],
-  teams: [...]
+  students: [],
+  teams: []
 }
 ```
 
@@ -126,10 +115,11 @@ flowchart LR
   id: "uuid",
   name: "Alice",
   password: "simple123",
-  roleTagIds: ["developer", "designer"],
-  vibeTagIds: ["night-owl", "focused"],
-  goalStatement: "I want to build a portfolio...",
-  teamId: null | "team-uuid"
+  roleTagIds: ["engineer", "designer"],
+  interestTagIds: ["edu-tech", "social-impact"],
+  customInterest: "",  // if "others" selected
+  messageToTeam: "Looking forward to building something cool!",
+  teamId: null
 }
 ```
 
@@ -138,36 +128,24 @@ flowchart LR
 {
   id: "uuid",
   name: "Team A",
-  memberIds: ["student-1", "student-2", ...],
+  memberIds: ["s1", "s2", "s3"],
   cohesionScore: 0.85
 }
 ```
 
 ---
 
-## Matching Algorithm
+## Screens (7 Views)
 
-### Pairwise Scoring (2 students)
-
-1. **Role Diversity Score** = Jaccard Distance of role tags
-   - Higher when students have *different* skills
-   - `1 - (intersection / union)`
-
-2. **Vibe Similarity Score** = Jaccard Similarity of vibe tags
-   - Higher when students have *similar* work styles
-   - `intersection / union`
-
-3. **Goal Alignment Score** = Fixed 0.5 (no embeddings in V2)
-   - Could use simple keyword matching in future
-
-4. **Total Score** = `(weight_role × role) + (weight_vibe × vibe) + (weight_goal × goal)`
-
-### Team Formation
-
-1. Build NxN compatibility matrix for all students
-2. Greedy algorithm: Pick seed student, add best-compatible members
-3. Optimization: Random swap iterations to improve total score
-4. Output: Teams with cohesion scores
+| Screen | Description |
+|--------|-------------|
+| `landing` | Session code input + Create button |
+| `join-session` | Name + Password form |
+| `create-session` | Instructor form |
+| `profile-input` | Multi-step: Roles → Interests → Message |
+| `waiting` | "Waiting for teams..." |
+| `instructor-dashboard` | Code display, Run Matching button |
+| `results` | Team cards with members |
 
 ---
 
@@ -175,88 +153,36 @@ flowchart LR
 
 ```
 who-to-v2/
-├── index.html      # Single page, all screens rendered via JS
-├── style.css       # Minimal styling (focus on structure)
-├── app.js          # State, rendering, logic, matching algorithm
-└── README.md       # How to use, collaborate, contribute
+├── index.html      # Single page app
+├── style.css       # Minimal CSS (structure first)
+├── app.js          # State, rendering, matching
+├── PRD.md          # This document
+├── DESIGN_V1.md    # Original design reference
+└── README.md       # How to use
 ```
 
 ---
 
-## Technical Decisions
+## What's NOT Included (Intentionally)
 
-| Decision | Rationale |
-|----------|-----------|
-| No framework | Full control, no build step, tiny file size |
-| In-memory state | Simple JS object, no localStorage for now |
-| Single HTML file | All screens are sections shown/hidden via JS |
-| Vanilla CSS | No Tailwind, easier to understand and modify |
-| ES6 modules | Clean code organization without bundler |
-
----
-
-## Proposed Changes
-
-### [NEW] [index.html](file:///Users/garycool/Desktop/Vibe%20code/who-to-v2/index.html)
-- Semantic HTML structure for all 7 screens
-- Meta tags, viewport settings
-- Script/CSS imports
-
-### [NEW] [style.css](file:///Users/garycool/Desktop/Vibe%20code/who-to-v2/style.css)
-- CSS variables for colors, spacing
-- Minimal layout styles
-- Screen visibility controls
-
-### [NEW] [app.js](file:///Users/garycool/Desktop/Vibe%20code/who-to-v2/app.js)
-- State management object
-- DOM rendering functions for each screen
-- Event handlers
-- Matching algorithm (ported from TypeScript)
-
-### [NEW] [README.md](file:///Users/garycool/Desktop/Vibe%20code/who-to-v2/README.md)
-- Project description
-- How to run locally
-- How to collaborate
+| Feature | Status |
+|---------|--------|
+| 3D Visualization | ❌ Removed permanently |
+| Goal embeddings | ❌ Not needed |
+| Real-time updates | ❌ Manual refresh instead |
+| Database | ❌ In-memory only |
 
 ---
 
 ## Verification Plan
 
-### Manual Testing
-
-After implementation, verify each user flow:
-
-1. **Instructor Flow**:
-   - Open `index.html` in browser
-   - Click "Create Session"
-   - Fill form and submit
-   - Verify 6-char code appears on dashboard
-
-2. **Student Flow**:
-   - Open in new tab/incognito
-   - Enter session code
-   - Complete profile steps
-   - Verify waiting screen appears
-
-3. **Matching Flow**:
-   - Return to instructor tab
-   - Click "Run Matching"
-   - Verify teams appear with cohesion scores
-
-4. **File Size Check**:
-   - Run `ls -la` on the folder
-   - Verify total size < 50KB
-   - Confirm no `node_modules` or build artifacts
+1. **Instructor Flow**: Create session → Get code → Dashboard works
+2. **Student Flow**: Join → Profile steps → Waiting screen
+3. **Matching**: Run matching → Teams displayed with scores
+4. **File Size**: Confirm total < 50KB
 
 ---
 
-## Questions for User
+## Ready to Build! 🚀
 
-> [!IMPORTANT]
-> Please confirm the following before I proceed:
-
-1. **Scope Confirmation**: The 3D visualization will be deferred to a future version. Is this acceptable?
-
-2. **Persistence**: Data will be lost on page refresh (in-memory only). Should I add `localStorage` support?
-
-3. **Styling Approach**: I'll create minimal CSS for now, focusing on structure. You can add design polish later. Sound good?
+All specs are finalized. Proceeding with implementation.
