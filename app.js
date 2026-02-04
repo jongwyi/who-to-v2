@@ -194,6 +194,28 @@ async function saveTeamsInDB(code, teams) {
     await db.ref('sessions/' + code + '/status').set('published');
 }
 
+// Assign a late-joining student to one existing team (when teams already published)
+async function assignLateJoinerToTeam(code, session, student) {
+    const teams = session.teams ? Object.values(session.teams) : [];
+    if (teams.length === 0) return null;
+    // Pick team with fewest members (balance size)
+    const sorted = [...teams].sort((a, b) => (a.memberIds?.length || 0) - (b.memberIds?.length || 0));
+    const team = sorted[0];
+    const memberIds = [...(team.memberIds || []), student.id];
+    const members = [...(team.members || []), student];
+    const newMemberIds = [...(team.newMemberIds || []), student.id];
+    const updatedTeam = {
+        ...team,
+        memberIds,
+        members,
+        newMemberIds
+    };
+    await db.ref('sessions/' + code + '/teams/' + team.id).set(updatedTeam);
+    student.teamId = team.id;
+    await saveStudentInDB(code, student);
+    return updatedTeam;
+}
+
 // Listen for session changes (real-time updates)
 function listenToSession(code, callback) {
     db.ref('sessions/' + code).on('value', (snapshot) => {
@@ -488,28 +510,32 @@ function renderTeams(teams, showAll = false) {
                 </div>
             </div>
             ` : ''}
-            ${(team.members || []).map(member => `
-                <div class="member-card">
+            ${(team.members || []).map(member => {
+                const isNew = (team.newMemberIds && team.newMemberIds.includes(member.id));
+                return `
+                <div class="member-card ${isNew ? 'member-card-new' : ''}">
                     <div class="member-name">
                         ${member.emoji || '👤'} ${member.name}
+                        ${isNew ? '<span class="member-new-badge">new</span>' : ''}
                         ${state.currentStudent && member.id === state.currentStudent.id ? '<span style="color: var(--accent-primary);"> (You)</span>' : ''}
                     </div>
                     <div class="member-roles">
                         ${(member.roleTagIds || []).map(id => {
-        const tag = findRole(id);
-        return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
-    }).join('')}
+                            const tag = findRole(id);
+                            return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
+                        }).join('')}
                     </div>
                     <div class="member-interests">
                         ${(member.interestTagIds || []).filter(id => id !== 'others').map(id => {
-        const tag = findInterest(id);
-        return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
-    }).join('')}
+                            const tag = findInterest(id);
+                            return tag ? `<span class="member-tag">${tag.emoji} ${tag.name}</span>` : '';
+                        }).join('')}
                         ${member.customInterest ? `<span class="member-tag">✏️ ${member.customInterest}</span>` : ''}
                     </div>
                     ${member.messageToTeam ? `<p class="member-message">"${member.messageToTeam}"</p>` : ''}
                 </div>
-            `).join('')}
+            `;
+            }).join('')}
         </div>
     `;
     }).join('');
@@ -1207,19 +1233,33 @@ function initEventListeners() {
                 state.selectedRoles = [];
                 state.selectedInterests = [];
 
-                // Start listening for updates
-                listenToSession(state.currentSession.code, (updatedSession) => {
-                    state.currentSession = updatedSession;
-                    if (updatedSession.status === 'published') {
-                        const teams = updatedSession.teams ? Object.values(updatedSession.teams) : [];
-                        const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(student.id));
+                const session = state.currentSession;
+                if (session.status === 'published') {
+                    // Teams already published: assign this student to one existing team and show result
+                    const myTeam = await assignLateJoinerToTeam(session.code, session, student);
+                    if (myTeam) {
+                        state.currentStudent = student;
+                        state.currentSession = { ...session, teams: { ...session.teams, [myTeam.id]: myTeam } };
                         document.getElementById('results-title').textContent = '🎉 Your Team';
-                        renderTeams(myTeam ? [myTeam] : []);
+                        renderTeams([myTeam]);
                         showScreen('results');
+                    } else {
+                        showScreen('waiting');
                     }
-                });
-
-                showScreen('waiting');
+                } else {
+                    // Start listening for updates
+                    listenToSession(state.currentSession.code, (updatedSession) => {
+                        state.currentSession = updatedSession;
+                        if (updatedSession.status === 'published') {
+                            const teams = updatedSession.teams ? Object.values(updatedSession.teams) : [];
+                            const myTeam = teams.find(t => t.memberIds && t.memberIds.includes(student.id));
+                            document.getElementById('results-title').textContent = '🎉 Your Team';
+                            renderTeams(myTeam ? [myTeam] : []);
+                            showScreen('results');
+                        }
+                    });
+                    showScreen('waiting');
+                }
             } catch (err) {
                 alert('Error saving profile: ' + err.message);
             }
