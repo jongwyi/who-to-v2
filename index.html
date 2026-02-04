@@ -200,6 +200,39 @@
                         <button id="btn-run-matching" class="btn btn-primary">🎲 Run Matching</button>
                     </div>
                 </div>
+
+                <!-- Experimental Features -->
+                <div class="card" style="margin-top: 1.5rem; border: 1px dashed var(--accent-primary);">
+                    <h4 style="margin-bottom: 1rem;">🧪 Experiment Mode</h4>
+
+                    <div class="form-group">
+                        <label class="form-label">Generate Dummy Students</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="number" id="dummy-count" class="form-input" value="30" min="4" max="100"
+                                style="width: 100px;">
+                            <button id="btn-generate-dummy" class="btn btn-secondary">Generate</button>
+                            <button id="btn-clear-students" class="btn btn-ghost">Clear All</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 1rem;">
+                        <label class="form-label">Matching Algorithm</label>
+                        <div id="algorithm-selector" style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                            <button class="btn btn-secondary algorithm-btn active"
+                                data-algorithm="greedy">Greedy</button>
+                            <button class="btn btn-secondary algorithm-btn" data-algorithm="random">Random</button>
+                            <button class="btn btn-secondary algorithm-btn" data-algorithm="balanced">Balanced</button>
+                        </div>
+                        <p class="hint-text" id="algorithm-description" style="margin-top: 0.5rem;">
+                            Greedy: Picks best matches one by one
+                        </p>
+                    </div>
+
+                    <div id="experiment-results" style="margin-top: 1rem; display: none;">
+                        <h5>📊 Results Comparison</h5>
+                        <div id="comparison-table"></div>
+                    </div>
+                </div>
             </div>
         </section>
 

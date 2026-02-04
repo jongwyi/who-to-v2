@@ -406,6 +406,264 @@ function renderDashboard() {
 }
 
 // ============================================
+// DUMMY DATA GENERATOR
+// ============================================
+
+const FIRST_NAMES = ['Alex', 'Jordan', 'Taylor', 'Morgan', 'Casey', 'Riley', 'Quinn', 'Avery', 'Skyler', 'Dakota',
+    'Charlie', 'Sam', 'Jamie', 'Drew', 'Reese', 'Finley', 'Sage', 'River', 'Phoenix', 'Rowan',
+    'Blair', 'Emery', 'Hayden', 'Kendall', 'Logan', 'Peyton', 'Parker', 'Sawyer', 'Sydney', 'Tyler'];
+
+const MESSAGES = [
+    "Excited to work together!", "Let's build something great!", "Ready to collaborate!",
+    "Looking forward to learning!", "Can't wait to start!", "Let's do this!",
+    "Happy to be here!", "Ready to contribute!", "Let's make an impact!",
+    "Eager to help the team!", "Open to new ideas!", "Let's innovate together!"
+];
+
+function generateDummyStudents(count) {
+    const students = [];
+
+    for (let i = 0; i < count; i++) {
+        const name = FIRST_NAMES[i % FIRST_NAMES.length] + (Math.floor(i / FIRST_NAMES.length) || '');
+
+        // Random roles (1-3)
+        const numRoles = Math.floor(Math.random() * 3) + 1;
+        const roleTagIds = [];
+        const availableRoles = [...ROLE_TAGS.map(t => t.id)];
+        for (let r = 0; r < numRoles; r++) {
+            const idx = Math.floor(Math.random() * availableRoles.length);
+            roleTagIds.push(availableRoles.splice(idx, 1)[0]);
+        }
+
+        // Random interests (1-3)
+        const numInterests = Math.floor(Math.random() * 3) + 1;
+        const interestTagIds = [];
+        const availableInterests = INTEREST_TAGS.filter(t => t.id !== 'others').map(t => t.id);
+        for (let r = 0; r < numInterests; r++) {
+            const idx = Math.floor(Math.random() * availableInterests.length);
+            interestTagIds.push(availableInterests.splice(idx, 1)[0]);
+        }
+
+        students.push({
+            id: generateId(),
+            name: name,
+            password: 'dummy',
+            roleTagIds: roleTagIds,
+            interestTagIds: interestTagIds,
+            customInterest: '',
+            messageToTeam: MESSAGES[Math.floor(Math.random() * MESSAGES.length)],
+            teamId: null
+        });
+    }
+
+    return students;
+}
+
+// ============================================
+// ALTERNATIVE MATCHING ALGORITHMS
+// ============================================
+
+// Current algorithm selection
+let selectedAlgorithm = 'greedy';
+
+const ALGORITHM_DESCRIPTIONS = {
+    'greedy': 'Greedy: Picks best matches iteratively - good cohesion but may not be globally optimal',
+    'random': 'Random: Shuffles students randomly - baseline for comparison',
+    'balanced': 'Balanced: Ensures role diversity within each team first, then optimizes for interests'
+};
+
+// Random Team Formation - just shuffles and splits
+function randomTeamFormation(students, teamSize, matrix) {
+    const n = students.length;
+    const numTeams = Math.ceil(n / teamSize);
+    const shuffled = [...Array(n).keys()].sort(() => Math.random() - 0.5);
+    const teams = [];
+
+    for (let t = 0; t < numTeams; t++) {
+        const team = shuffled.slice(t * teamSize, (t + 1) * teamSize);
+        if (team.length > 0) {
+            teams.push(team);
+        }
+    }
+
+    return teams;
+}
+
+// Balanced Team Formation - ensures role diversity first
+function balancedTeamFormation(students, teamSize, matrix) {
+    const n = students.length;
+    const numTeams = Math.ceil(n / teamSize);
+
+    // Group students by their primary role
+    const roleGroups = {};
+    ROLE_TAGS.forEach(tag => { roleGroups[tag.id] = []; });
+
+    students.forEach((student, idx) => {
+        const primaryRole = student.roleTagIds[0] || 'engineer';
+        roleGroups[primaryRole].push(idx);
+    });
+
+    // Initialize teams
+    const teams = Array(numTeams).fill(null).map(() => []);
+    const assigned = Array(n).fill(false);
+
+    // Round-robin: distribute one from each role to each team
+    let teamIdx = 0;
+    for (const role of Object.keys(roleGroups)) {
+        for (const studentIdx of roleGroups[role]) {
+            if (!assigned[studentIdx] && teams[teamIdx].length < teamSize) {
+                teams[teamIdx].push(studentIdx);
+                assigned[studentIdx] = true;
+                teamIdx = (teamIdx + 1) % numTeams;
+            }
+        }
+    }
+
+    // Fill remaining slots with best compatibility matches
+    for (let t = 0; t < numTeams; t++) {
+        while (teams[t].length < teamSize) {
+            let bestCandidate = -1;
+            let bestScore = -1;
+
+            for (let candidate = 0; candidate < n; candidate++) {
+                if (assigned[candidate]) continue;
+
+                if (teams[t].length === 0) {
+                    bestCandidate = candidate;
+                    break;
+                }
+
+                const avgWithTeam = teams[t].reduce(
+                    (sum, member) => sum + matrix[candidate][member], 0
+                ) / teams[t].length;
+
+                if (avgWithTeam > bestScore) {
+                    bestScore = avgWithTeam;
+                    bestCandidate = candidate;
+                }
+            }
+
+            if (bestCandidate >= 0) {
+                teams[t].push(bestCandidate);
+                assigned[bestCandidate] = true;
+            } else {
+                break;
+            }
+        }
+    }
+
+    return teams.filter(t => t.length > 0);
+}
+
+// Run matching with specified algorithm
+function runMatchingWithAlgorithm(session, algorithmName) {
+    const studentsObj = session.students || {};
+    const students = Object.values(studentsObj).filter(s => s.roleTagIds && s.roleTagIds.length > 0);
+
+    if (students.length === 0) return { teams: [], avgCohesion: 0, minCohesion: 0, maxCohesion: 0 };
+
+    const total = session.weightRole + session.weightInterest;
+    const weights = {
+        role: session.weightRole / total,
+        interest: session.weightInterest / total
+    };
+
+    const matrix = buildCompatibilityMatrix(students, weights);
+
+    let teamIndices;
+    switch (algorithmName) {
+        case 'random':
+            teamIndices = randomTeamFormation(students, session.teamSize, matrix);
+            break;
+        case 'balanced':
+            teamIndices = balancedTeamFormation(students, session.teamSize, matrix);
+            break;
+        case 'greedy':
+        default:
+            teamIndices = greedyTeamFormation(students, session.teamSize, matrix);
+            break;
+    }
+
+    const teams = teamIndices.map((indices, i) => {
+        const teamId = generateId();
+        const teamName = `Team ${String.fromCharCode(65 + i)}`;
+        const cohesionScore = calculateTeamCohesion(indices, matrix);
+        const members = indices.map(idx => students[idx]);
+
+        members.forEach(member => {
+            member.teamId = teamId;
+        });
+
+        return {
+            id: teamId,
+            name: teamName,
+            cohesionScore,
+            memberIds: members.map(m => m.id),
+            members
+        };
+    });
+
+    // Calculate stats
+    const cohesionScores = teams.map(t => t.cohesionScore);
+    const avgCohesion = cohesionScores.reduce((a, b) => a + b, 0) / cohesionScores.length;
+    const minCohesion = Math.min(...cohesionScores);
+    const maxCohesion = Math.max(...cohesionScores);
+
+    teams.sort((a, b) => b.cohesionScore - a.cohesionScore);
+
+    return { teams, avgCohesion, minCohesion, maxCohesion };
+}
+
+// Compare all algorithms
+function compareAlgorithms(session) {
+    const results = {};
+
+    ['greedy', 'random', 'balanced'].forEach(algo => {
+        const result = runMatchingWithAlgorithm(session, algo);
+        results[algo] = {
+            avgCohesion: result.avgCohesion,
+            minCohesion: result.minCohesion,
+            maxCohesion: result.maxCohesion,
+            teams: result.teams
+        };
+    });
+
+    return results;
+}
+
+// Render comparison table
+function renderComparisonTable(results) {
+    const container = document.getElementById('comparison-table');
+
+    container.innerHTML = `
+        <table style="width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--border-color);">
+                    <th style="text-align: left; padding: 0.5rem;">Algorithm</th>
+                    <th style="text-align: center; padding: 0.5rem;">Avg Score</th>
+                    <th style="text-align: center; padding: 0.5rem;">Min</th>
+                    <th style="text-align: center; padding: 0.5rem;">Max</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${Object.entries(results).map(([algo, data]) => `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 0.5rem; font-weight: ${algo === selectedAlgorithm ? 'bold' : 'normal'};">
+                            ${algo === selectedAlgorithm ? '✓ ' : ''}${algo.charAt(0).toUpperCase() + algo.slice(1)}
+                        </td>
+                        <td style="text-align: center; padding: 0.5rem;">${(data.avgCohesion * 100).toFixed(1)}%</td>
+                        <td style="text-align: center; padding: 0.5rem;">${(data.minCohesion * 100).toFixed(1)}%</td>
+                        <td style="text-align: center; padding: 0.5rem;">${(data.maxCohesion * 100).toFixed(1)}%</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
+
+    document.getElementById('experiment-results').style.display = 'block';
+}
+
+// ============================================
 // VALIDATION FUNCTIONS
 // ============================================
 
@@ -785,7 +1043,90 @@ function initEventListeners() {
     document.getElementById('btn-back-dashboard').addEventListener('click', () => {
         showScreen('instructor-dashboard');
     });
+
+    // ============================================
+    // EXPERIMENT MODE EVENT HANDLERS
+    // ============================================
+
+    // Generate dummy students
+    document.getElementById('btn-generate-dummy').addEventListener('click', async () => {
+        const count = parseInt(document.getElementById('dummy-count').value) || 30;
+        const session = state.currentSession;
+
+        if (!session) {
+            alert('No session active!');
+            return;
+        }
+
+        try {
+            const dummyStudents = generateDummyStudents(count);
+
+            // Save to Firebase
+            for (const student of dummyStudents) {
+                await saveStudentInDB(session.code, student);
+            }
+
+            // Refresh dashboard
+            const updatedSession = await getSessionByCode(session.code);
+            state.currentSession = updatedSession;
+            renderDashboard();
+
+            alert(`✅ Generated ${count} dummy students!`);
+
+            // Auto-run comparison
+            const results = compareAlgorithms(updatedSession);
+            renderComparisonTable(results);
+        } catch (err) {
+            alert('Error generating dummy data: ' + err.message);
+        }
+    });
+
+    // Clear all students
+    document.getElementById('btn-clear-students').addEventListener('click', async () => {
+        const session = state.currentSession;
+
+        if (!session) return;
+
+        if (!confirm('Clear all students from this session?')) return;
+
+        try {
+            await db.ref('sessions/' + session.code + '/students').remove();
+            await db.ref('sessions/' + session.code + '/teams').remove();
+            await db.ref('sessions/' + session.code + '/status').set('open');
+
+            const updatedSession = await getSessionByCode(session.code);
+            state.currentSession = updatedSession;
+            renderDashboard();
+
+            document.getElementById('experiment-results').style.display = 'none';
+
+            alert('✅ Cleared all students!');
+        } catch (err) {
+            alert('Error: ' + err.message);
+        }
+    });
+
+    // Algorithm selector
+    document.querySelectorAll('.algorithm-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+            // Update selection
+            document.querySelectorAll('.algorithm-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            selectedAlgorithm = btn.dataset.algorithm;
+            document.getElementById('algorithm-description').textContent =
+                ALGORITHM_DESCRIPTIONS[selectedAlgorithm];
+
+            // Run comparison if we have students
+            const session = state.currentSession;
+            if (session && session.students && Object.keys(session.students).length > 0) {
+                const results = compareAlgorithms(session);
+                renderComparisonTable(results);
+            }
+        });
+    });
 }
+
 
 // ============================================
 // INITIALIZATION
