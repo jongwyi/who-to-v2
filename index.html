@@ -5,8 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WHO2MEET | Find Your Perfect Team</title>
     <link rel="stylesheet" href="style.css">
+
+    <!--========================================
+         GOOGLE ADSENSE HEAD SCRIPT
+    ======================================== -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8670999421203050"
+    crossorigin="anonymous"></script>
 </head>
 <body>
+    <!-- Shared SVG gradient defs for glass shapes -->
+    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0">
+        <defs>
+            <linearGradient id="glass-pink" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffe4ec" stop-opacity="0.9"/>
+                <stop offset="50%" stop-color="#ffcce0" stop-opacity="0.7"/>
+                <stop offset="100%" stop-color="#ffb3d9" stop-opacity="0.6"/>
+            </linearGradient>
+            <linearGradient id="glass-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d4e9ff" stop-opacity="0.9"/>
+                <stop offset="50%" stop-color="#b8e0ff" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#a3d4ff" stop-opacity="0.65"/>
+            </linearGradient>
+            <linearGradient id="glass-purple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e8dcff" stop-opacity="0.9"/>
+                <stop offset="50%" stop-color="#d4c4f7" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#c9b3ff" stop-opacity="0.65"/>
+            </linearGradient>
+            <linearGradient id="glass-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#d4f7f4" stop-opacity="0.9"/>
+                <stop offset="50%" stop-color="#b5f0e8" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#9ee8e0" stop-opacity="0.65"/>
+            </linearGradient>
+            <linearGradient id="glass-peach" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#fff0e6" stop-opacity="0.9"/>
+                <stop offset="50%" stop-color="#ffe0cc" stop-opacity="0.75"/>
+                <stop offset="100%" stop-color="#ffd1b3" stop-opacity="0.65"/>
+            </linearGradient>
+            <filter id="glass-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0,0,0,0.08)" flood-opacity="1"/>
+            </filter>
+        </defs>
+    </svg>
     <header class="app-header">
         <div class="header-inner">
             <a href="#" id="logo-home" class="logo-text">WHO2MEET</a>
@@ -18,9 +57,19 @@
         LANDING SCREEN
     ======================================== -->
     <main id="app">
-        <section id="landing" class="screen active">
+        <section id="landing" class="screen active screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
-                <h1 class="version-display">(1.2.0)</h1>
+                <h1 class="version-display">(2.2.0)</h1>
                 <div class="hero">
                     <div class="hero-logo">🤝</div>
                     <h1 class="hero-title" data-i18n="appTitle">WHO2MEET</h1>
@@ -38,6 +87,10 @@
                 <p class="hint-text" style="margin-top: 1rem; text-align: center;">
                     <a href="#" id="btn-instructor-relogin" class="link" data-i18n="reEnterInstructor">Re-enter as Instructor →</a>
                 </p>
+                <div class="divider" style="margin-top: 1.5rem;"><span data-i18n="newToService">New here?</span></div>
+                <a href="#" id="btn-view-tutorial" class="tutorial-entry-link" data-i18n="viewTutorial">
+                    <span class="tutorial-entry-icon">📚</span> <span class="tutorial-entry-text">View Tutorial →</span>
+                </a>
                 <div class="divider" style="margin-top: 1.5rem;"><span>Test</span></div>
                 <button id="btn-quick-test" class="btn btn-ghost btn-full" type="button">🧪 Quick Test (30 users)</button>
             </div>
@@ -48,7 +101,17 @@
         <!-- ========================================
              INSTRUCTOR RE-LOGIN SCREEN
         ======================================== -->
-        <section id="instructor-relogin" class="screen">
+        <section id="instructor-relogin" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
                 <h2 data-i18n="instructorDashboard">Instructor Re-Login</h2>
                 <div class="card">
@@ -76,7 +139,17 @@
         <!-- ========================================
              JOIN SESSION SCREEN
         ======================================== -->
-        <section id="join-session" class="screen">
+        <section id="join-session" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
                 <h2 data-i18n="joinSession">Join Session</h2>
                 <p class="session-info">Session Code: <strong id="display-join-code"></strong></p>
@@ -106,7 +179,17 @@
              CREATE SESSION SCREEN
         ======================================== -->
 
-        <section id="create-session" class="screen">
+        <section id="create-session" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
                 <h2 data-i18n="createSession">Create Session</h2>
                 <div class="card">
@@ -166,7 +249,17 @@
         <!-- ========================================
              PROFILE INPUT SCREEN
         ======================================== -->
-        <section id="profile-input" class="screen">
+        <section id="profile-input" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
                 <div class="steps">
                     <div class="step-dot active" data-step="1"></div>
@@ -203,7 +296,17 @@
         <!-- ========================================
              WAITING SCREEN
         ======================================== -->
-        <section id="waiting" class="screen">
+        <section id="waiting" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container">
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -216,7 +319,17 @@
         <!-- ========================================
              INSTRUCTOR DASHBOARD SCREEN
         ======================================== -->
-        <section id="instructor-dashboard" class="screen">
+        <section id="instructor-dashboard" class="screen screen-with-shapes">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container container-wide">
                 <h2 data-i18n="instructorDashboard">Instructor Dashboard</h2>
                 <div class="session-code-display">
@@ -239,7 +352,17 @@
         <!-- ========================================
              RESULTS SCREEN
         ======================================== -->
-        <section id="results" class="screen">
+        <section id="results" class="screen screen-with-shapes results-cute">
+            <div class="bg-shapes" aria-hidden="true">
+                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
+                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
+                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
+                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
+                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
+                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
+                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
+                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
+            </div>
             <div class="container container-wide">
                 <h2 id="results-title">Your Team</h2>
                 <div id="teams-container"></div>
@@ -250,9 +373,79 @@
         </section>
     </main>
 
+    <!-- Tutorial: Role Selection Modal -->
+    <div id="tutorial-role-modal" class="tutorial-overlay" aria-hidden="true">
+        <div class="tutorial-modal tutorial-role-modal">
+            <button type="button" class="tutorial-close" id="tutorial-role-close" aria-label="Close">×</button>
+            <h2 class="tutorial-modal-title" data-i18n="roleSelection">Role Selection</h2>
+            <p class="tutorial-modal-subtitle" data-i18n="roleSelectionSubtitle">Select a role to view the tutorial</p>
+            <div class="tutorial-role-cards">
+                <button type="button" class="tutorial-role-card" data-role="instructor">
+                    <span class="tutorial-role-icon">👩‍🏫</span>
+                    <span class="tutorial-role-title" data-i18n="instructor">Instructor</span>
+                    <span class="tutorial-role-desc" data-i18n="instructorDesc">Creates sessions and matches students</span>
+                </button>
+                <button type="button" class="tutorial-role-card" data-role="participant">
+                    <span class="tutorial-role-icon">🎓</span>
+                    <span class="tutorial-role-title" data-i18n="student">Student</span>
+                    <span class="tutorial-role-desc" data-i18n="studentDesc">Joins sessions and selects roles</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tutorial: Step Modal -->
+    <div id="tutorial-step-modal" class="tutorial-overlay" aria-hidden="true">
+        <div class="tutorial-modal tutorial-step-modal">
+            <button type="button" class="tutorial-close" id="tutorial-step-close" aria-label="Close">×</button>
+            <h2 class="tutorial-step-title" id="tutorial-step-title">Step 1</h2>
+            <div class="tutorial-progress">
+                <span class="tutorial-progress-dot active" data-step="1"></span>
+                <span class="tutorial-progress-dot" data-step="2"></span>
+                <span class="tutorial-progress-dot" data-step="3"></span>
+                <span class="tutorial-progress-dot" data-step="4"></span>
+            </div>
+            <div class="tutorial-step-content">
+                <img id="tutorial-step-image" class="tutorial-step-image" src="" alt="">
+                <p class="tutorial-step-instruction" id="tutorial-step-instruction"></p>
+            </div>
+            <div class="tutorial-step-footer">
+                <button type="button" class="btn btn-ghost" id="tutorial-prev" data-i18n="previous">← Previous</button>
+                <span class="tutorial-step-counter" id="tutorial-step-counter">Step 1 / 4</span>
+                <button type="button" class="btn btn-primary" id="tutorial-next" data-i18n="tutorialNext">Next →</button>
+            </div>
+        </div>
+    </div>
+
+    <!--========================================
+         GSTATIC SCRIPT and FIREBASE SCRIPT
+    ======================================== -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+
+    <!--========================================
+         GOOGLE ADSENSE BODY SCRIPT   
+    ======================================== -->
+
+    <!-- 광고 시험 -->
+    <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-8670999421203050"
+        data-ad-slot="2390683281"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+    </script>
+
+    <!--========================================
+         JAVASCRIPT SCRIPT
+    ======================================== -->
     <script type="module" src="js/main.js"></script>
     <script src="app.js"></script>
+
+    <!--========================================
+         END OF BODY
+    ======================================== -->
 </body>
 </html>

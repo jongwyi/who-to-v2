@@ -8,6 +8,7 @@ import * as matching from './matching.js';
 import * as render from './render.js';
 import * as i18n from './i18n.js';
 import * as renderfortest from './renderfortest.js';
+import * as tutorial from './tutorial.js';
 
 firebase.initFirebase(firebaseConfig);
 
@@ -20,7 +21,8 @@ window.WHO2MEET = {
     matching,
     render,
     i18n,
-    renderfortest
+    renderfortest,
+    tutorial
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -32,10 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
             i18n.setLang(next);
             langBtn.textContent = next === 'en' ? '한' : 'EN';
             i18n.applyToPage();
+            tutorial.refreshIfVisible();
         });
     }
     i18n.applyToPage();
     if (typeof window.WHO2MEET_initEvents === 'function') {
         window.WHO2MEET_initEvents();
     }
+    tutorial.initTutorial();
 });
