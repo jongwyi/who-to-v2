@@ -1,3 +1,4 @@
 .DS_Store
 node_modules/
 WHO2MEET-fck-backup/
+firebase-debug.log
