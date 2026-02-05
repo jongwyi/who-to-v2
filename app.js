@@ -1,0 +1,470 @@
+(function () {
+    'use strict';
+
+    function initEvents() {
+        var W = window.WHO2MEET;
+        if (!W) return;
+        var state = W.state;
+        var utils = W.utils;
+        var firebase = W.firebase;
+        var tags = W.tags;
+        var nav = W.nav;
+        var matching = W.matching;
+        var render = W.render;
+        var joinCodeInput = document.getElementById('join-code');
+        if (joinCodeInput) {
+            joinCodeInput.addEventListener('input', function (e) {
+                e.target.value = e.target.value.toUpperCase();
+                document.getElementById('btn-go-join').disabled = e.target.value.length !== 6;
+            });
+        }
+
+        document.getElementById('btn-go-join') && document.getElementById('btn-go-join').addEventListener('click', function () {
+            var codeEl = document.getElementById('join-code');
+            var displayEl = document.getElementById('display-join-code');
+            if (codeEl && displayEl) {
+                displayEl.textContent = codeEl.value;
+                nav.showScreen('join-session');
+            }
+        });
+
+        document.getElementById('btn-go-create') && document.getElementById('btn-go-create').addEventListener('click', function () {
+            tags.initCreateSessionTags();
+            nav.showScreen('create-session');
+        });
+
+        document.querySelectorAll('[data-go]').forEach(function (btn) {
+            btn.addEventListener('click', function () { nav.showScreen(btn.dataset.go); });
+        });
+
+        document.getElementById('btn-instructor-relogin') && document.getElementById('btn-instructor-relogin').addEventListener('click', function (e) {
+            e.preventDefault();
+            nav.showScreen('instructor-relogin');
+        });
+
+        document.getElementById('logo-home') && document.getElementById('logo-home').addEventListener('click', function (e) {
+            e.preventDefault();
+            nav.showScreen('landing');
+        });
+
+        document.getElementById('btn-quick-test') && document.getElementById('btn-quick-test').addEventListener('click', function (e) {
+            e.preventDefault();
+            if (W.renderfortest && W.renderfortest.runQuickTest) {
+                W.renderfortest.runQuickTest();
+            }
+        });
+
+        var reloginCodeInput = document.getElementById('relogin-code');
+        var reloginNameInput = document.getElementById('relogin-name');
+        var reloginPasswordInput = document.getElementById('relogin-password');
+        function validateReloginForm() {
+            var code = reloginCodeInput && reloginCodeInput.value.trim();
+            var name = reloginNameInput && reloginNameInput.value.trim();
+            var password = reloginPasswordInput && reloginPasswordInput.value.trim();
+            var btn = document.getElementById('btn-instructor-login');
+            if (btn) btn.disabled = !code || code.length !== 6 || !name || !password;
+        }
+        if (reloginCodeInput) reloginCodeInput.addEventListener('input', function (e) { e.target.value = e.target.value.toUpperCase(); validateReloginForm(); });
+        if (reloginNameInput) reloginNameInput.addEventListener('input', validateReloginForm);
+        if (reloginPasswordInput) reloginPasswordInput.addEventListener('input', validateReloginForm);
+
+        document.getElementById('btn-instructor-login') && document.getElementById('btn-instructor-login').addEventListener('click', async function () {
+            var code = (reloginCodeInput && reloginCodeInput.value.trim() || '').toUpperCase();
+            var name = (reloginNameInput && reloginNameInput.value.trim()) || '';
+            var password = (reloginPasswordInput && reloginPasswordInput.value.trim()) || '';
+            try {
+                var session = await firebase.getSessionByCode(code);
+                if (!session) {
+                    document.getElementById('relogin-error').textContent = 'Session not found. Check the code.';
+                    return;
+                }
+                if (session.instructorName !== name || session.instructorPassword !== password) {
+                    document.getElementById('relogin-error').textContent = 'Invalid name or password.';
+                    return;
+                }
+                state.currentSession = session;
+                state.isInstructor = true;
+                firebase.listenToSession(code, function (updatedSession) {
+                    state.currentSession = updatedSession;
+                    if (state.currentScreen === 'instructor-dashboard') render.renderDashboard();
+                    else if (state.currentScreen === 'results') {
+                        var teams = Object.values(updatedSession.teams || {});
+                        document.getElementById('results-title').textContent = 'All Teams';
+                        var backBtn = document.getElementById('btn-back-dashboard');
+                        if (backBtn) backBtn.style.display = 'block';
+                        render.renderTeams(teams, true);
+                    }
+                });
+                if (reloginCodeInput) reloginCodeInput.value = '';
+                if (reloginNameInput) reloginNameInput.value = '';
+                if (reloginPasswordInput) reloginPasswordInput.value = '';
+                document.getElementById('relogin-error').textContent = '';
+                render.renderDashboard();
+                nav.showScreen('instructor-dashboard');
+            } catch (err) {
+                document.getElementById('relogin-error').textContent = 'Error: ' + err.message;
+            }
+        });
+
+        var studentNameInput = document.getElementById('student-name');
+        var studentPasswordInput = document.getElementById('student-password');
+        function validateJoinForm() {
+            var name = studentNameInput && studentNameInput.value.trim();
+            var password = studentPasswordInput && studentPasswordInput.value.trim();
+            var btn = document.getElementById('btn-join-session');
+            if (btn) btn.disabled = !name || !password;
+        }
+        if (studentNameInput) studentNameInput.addEventListener('input', validateJoinForm);
+        if (studentPasswordInput) studentPasswordInput.addEventListener('input', validateJoinForm);
+
+        document.getElementById('btn-join-session') && document.getElementById('btn-join-session').addEventListener('click', async function () {
+            var code = document.getElementById('display-join-code').textContent;
+            var name = (studentNameInput && studentNameInput.value.trim()) || '';
+            var password = (studentPasswordInput && studentPasswordInput.value.trim()) || '';
+            var emojiInput = (document.getElementById('student-emoji') && document.getElementById('student-emoji').value || '').trim().slice(0, 4);
+            try {
+                var session = await firebase.getSessionByCode(code);
+                if (!session) {
+                    document.getElementById('join-error').textContent = 'Session not found. Check the code.';
+                    return;
+                }
+                state.currentSession = session;
+                var students = session.students || {};
+                var existingStudent = Object.values(students).find(function (s) { return s.name.toLowerCase() === name.toLowerCase(); });
+
+                if (existingStudent) {
+                    if (existingStudent.password !== password) {
+                        document.getElementById('join-error').textContent = 'Wrong password.';
+                        return;
+                    }
+                    if (emojiInput) {
+                        existingStudent.emoji = emojiInput;
+                        await firebase.saveStudentInDB(code, existingStudent);
+                    }
+                    state.currentStudent = existingStudent;
+                    if (existingStudent.roleTagIds && existingStudent.roleTagIds.length > 0) {
+                        if (session.status === 'published') {
+                            var teams = session.teams ? Object.values(session.teams) : [];
+                            var myTeam = teams.find(function (t) { return t.memberIds && t.memberIds.includes(existingStudent.id); });
+                            document.getElementById('results-title').textContent = 'Your Team';
+                            render.renderTeams(myTeam ? [myTeam] : []);
+                            nav.showScreen('results');
+                        } else {
+                            firebase.listenToSession(code, function (updatedSession) {
+                                state.currentSession = updatedSession;
+                                if (updatedSession.status === 'published') {
+                                    var teamsList = updatedSession.teams ? Object.values(updatedSession.teams) : [];
+                                    var myTeam = teamsList.find(function (t) { return t.memberIds && t.memberIds.includes(state.currentStudent.id); });
+                                    document.getElementById('results-title').textContent = 'Your Team';
+                                    render.renderTeams(myTeam ? [myTeam] : []);
+                                    nav.showScreen('results');
+                                }
+                            });
+                            nav.showScreen('waiting');
+                        }
+                    } else {
+                        render.renderRoleTags();
+                        render.renderInterestTags();
+                        render.renderProfileStep(1);
+                        nav.showScreen('profile-input');
+                    }
+                } else {
+                    var newStudent = {
+                        id: utils.generateId(),
+                        name: name,
+                        emoji: emojiInput || '',
+                        password: password,
+                        roleTagIds: [],
+                        interestTagIds: [],
+                        customInterest: '',
+                        messageToTeam: '',
+                        teamId: null
+                    };
+                    await firebase.saveStudentInDB(code, newStudent);
+                    state.currentStudent = newStudent;
+                    render.renderRoleTags();
+                    render.renderInterestTags();
+                    render.renderProfileStep(1);
+                    nav.showScreen('profile-input');
+                }
+            } catch (err) {
+                document.getElementById('join-error').textContent = 'Error: ' + err.message;
+            }
+        });
+
+        var sessionNameInput = document.getElementById('session-name');
+        var instructorNameInput = document.getElementById('instructor-name');
+        var instructorPasswordInput = document.getElementById('instructor-password');
+        function validateCreateForm() {
+            var sessionName = sessionNameInput && sessionNameInput.value.trim();
+            var name = instructorNameInput && instructorNameInput.value.trim();
+            var password = instructorPasswordInput && instructorPasswordInput.value.trim();
+            var roleTags = tags.getCreateRoleTags();
+            var interestTags = tags.getCreateInterestTags();
+            var hasTags = roleTags.length > 0 && interestTags.length > 0;
+            var btn = document.getElementById('btn-create-session');
+            if (btn) btn.disabled = !sessionName || !name || !password || !hasTags;
+        }
+        if (sessionNameInput) sessionNameInput.addEventListener('input', validateCreateForm);
+        if (instructorNameInput) instructorNameInput.addEventListener('input', validateCreateForm);
+        if (instructorPasswordInput) instructorPasswordInput.addEventListener('input', validateCreateForm);
+
+        document.getElementById('btn-add-role-tag') && document.getElementById('btn-add-role-tag').addEventListener('click', function () {
+            tags.appendCreateRoleTagRow('', '');
+            validateCreateForm();
+        });
+        document.getElementById('btn-add-interest-tag') && document.getElementById('btn-add-interest-tag').addEventListener('click', function () {
+            tags.appendCreateInterestTagRow('', '');
+            validateCreateForm();
+        });
+        document.getElementById('create-role-tags-list') && document.getElementById('create-role-tags-list').addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-remove-tag')) {
+                var row = e.target.closest('.create-tag-row');
+                if (row) row.remove();
+                validateCreateForm();
+            }
+        });
+        document.getElementById('create-interest-tags-list') && document.getElementById('create-interest-tags-list').addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-remove-tag')) {
+                var row = e.target.closest('.create-tag-row');
+                if (row) row.remove();
+                validateCreateForm();
+            }
+        });
+        document.getElementById('create-role-tags-list') && document.getElementById('create-role-tags-list').addEventListener('input', validateCreateForm);
+        document.getElementById('create-interest-tags-list') && document.getElementById('create-interest-tags-list').addEventListener('input', validateCreateForm);
+
+        var weightRoleSlider = document.getElementById('weight-role');
+        var weightInterestSlider = document.getElementById('weight-interest');
+        function syncWeightDisplays() {
+            var roleEl = document.getElementById('weight-role-value');
+            var interestEl = document.getElementById('weight-interest-value');
+            if (weightRoleSlider && roleEl) roleEl.textContent = weightRoleSlider.value + '%';
+            if (weightInterestSlider && interestEl) interestEl.textContent = weightInterestSlider.value + '%';
+        }
+        if (weightRoleSlider) {
+            weightRoleSlider.addEventListener('input', function () {
+                if (weightInterestSlider) weightInterestSlider.value = String(100 - parseInt(weightRoleSlider.value, 10));
+                syncWeightDisplays();
+            });
+        }
+        if (weightInterestSlider) {
+            weightInterestSlider.addEventListener('input', function () {
+                if (weightRoleSlider) weightRoleSlider.value = String(100 - parseInt(weightInterestSlider.value, 10));
+                syncWeightDisplays();
+            });
+        }
+
+        document.getElementById('btn-create-session') && document.getElementById('btn-create-session').addEventListener('click', async function () {
+            var sessionName = (sessionNameInput && sessionNameInput.value.trim()) || '';
+            var instructorName = (instructorNameInput && instructorNameInput.value.trim()) || '';
+            var instructorEmoji = (document.getElementById('instructor-emoji') && document.getElementById('instructor-emoji').value || '').trim().slice(0, 4);
+            var instructorPassword = (instructorPasswordInput && instructorPasswordInput.value.trim()) || '';
+            var code = utils.generateSessionCode();
+            var roleWeight = weightRoleSlider ? parseInt(weightRoleSlider.value, 10) : 50;
+            var teamSize = parseInt((document.getElementById('team-size') && document.getElementById('team-size').value) || '4', 10);
+            var roleTags = tags.getCreateRoleTags();
+            var interestTags = tags.getCreateInterestTags();
+            if (roleTags.length === 0 || interestTags.length === 0) {
+                document.getElementById('create-error').textContent = 'Add at least one role tag and one interest tag.';
+                return;
+            }
+            var newSession = {
+                id: utils.generateId(),
+                code: code,
+                name: sessionName,
+                instructorName: instructorName,
+                instructorEmoji: instructorEmoji || '',
+                instructorPassword: instructorPassword,
+                teamSize: teamSize,
+                weightRole: roleWeight,
+                weightInterest: 100 - roleWeight,
+                status: 'open',
+                students: {},
+                teams: {},
+                roleTags: roleTags,
+                interestTags: interestTags
+            };
+            document.getElementById('create-error').textContent = '';
+            try {
+                await firebase.createSessionInDB(newSession);
+                state.currentSession = newSession;
+                state.isInstructor = true;
+                firebase.listenToSession(code, function (updatedSession) {
+                    state.currentSession = updatedSession;
+                    if (state.currentScreen === 'instructor-dashboard') render.renderDashboard();
+                    else if (state.currentScreen === 'results') {
+                        var teams = Object.values(updatedSession.teams || {});
+                        document.getElementById('results-title').textContent = 'All Teams';
+                        var backBtn = document.getElementById('btn-back-dashboard');
+                        if (backBtn) backBtn.style.display = 'block';
+                        render.renderTeams(teams, true);
+                    }
+                });
+                render.renderDashboard();
+                nav.showScreen('instructor-dashboard');
+            } catch (err) {
+                document.getElementById('create-error').textContent = 'Error: ' + err.message;
+            }
+        });
+
+        document.getElementById('role-tags') && document.getElementById('role-tags').addEventListener('click', function (e) {
+            var tagItem = e.target.closest('.tag-item');
+            if (!tagItem) return;
+            var tagId = tagItem.dataset.tagId;
+            var index = state.selectedRoles.indexOf(tagId);
+            if (index === -1) {
+                if (state.selectedRoles.length >= 2) state.selectedRoles[1] = tagId;
+                else state.selectedRoles.push(tagId);
+            } else {
+                state.selectedRoles.splice(index, 1);
+            }
+            render.renderRoleTags();
+            render.updateRolePrioritySummary();
+            render.validateProfileStep();
+        });
+
+        document.getElementById('interest-tags') && document.getElementById('interest-tags').addEventListener('click', function (e) {
+            var tagItem = e.target.closest('.tag-item');
+            if (!tagItem) return;
+            var tagId = tagItem.dataset.tagId;
+            var index = state.selectedInterests.indexOf(tagId);
+            if (index === -1) state.selectedInterests.push(tagId);
+            else state.selectedInterests.splice(index, 1);
+            var customGroup = document.getElementById('custom-interest-group');
+            if (customGroup) customGroup.style.display = state.selectedInterests.includes('others') ? 'block' : 'none';
+            render.renderInterestTags();
+            render.validateProfileStep();
+        });
+
+        document.getElementById('custom-interest') && document.getElementById('custom-interest').addEventListener('input', render.validateProfileStep);
+        document.getElementById('message-to-team') && document.getElementById('message-to-team').addEventListener('input', render.validateProfileStep);
+
+        document.getElementById('btn-profile-back') && document.getElementById('btn-profile-back').addEventListener('click', function () {
+            if (state.profileStep === 1) nav.showScreen('landing');
+            else render.renderProfileStep(state.profileStep - 1);
+        });
+
+        document.getElementById('btn-profile-next') && document.getElementById('btn-profile-next').addEventListener('click', async function () {
+            if (state.profileStep < 3) {
+                render.renderProfileStep(state.profileStep + 1);
+            } else {
+                var student = state.currentStudent;
+                student.roleTagIds = state.selectedRoles.slice();
+                student.interestTagIds = state.selectedInterests.slice();
+                student.customInterest = (document.getElementById('custom-interest') && document.getElementById('custom-interest').value || '').trim();
+                student.messageToTeam = (document.getElementById('message-to-team') && document.getElementById('message-to-team').value || '').trim();
+                try {
+                    await firebase.saveStudentInDB(state.currentSession.code, student);
+                    state.selectedRoles = [];
+                    state.selectedInterests = [];
+                    var session = state.currentSession;
+                    if (session.status === 'published') {
+                        var myTeam = await firebase.assignLateJoinerToTeam(session.code, session, student);
+                        if (myTeam) {
+                            state.currentStudent = student;
+                            await new Promise(function (r) { setTimeout(r, 350); });
+                            var updatedSession = await firebase.getSessionByCode(session.code);
+                            state.currentSession = updatedSession;
+                            var teams = Object.values(updatedSession.teams || {});
+                            var myTeamFromSession = teams.find(function (t) { return t.memberIds && t.memberIds.includes(student.id); });
+                            document.getElementById('results-title').textContent = 'Your Team';
+                            render.renderTeams(myTeamFromSession ? [myTeamFromSession] : [myTeam]);
+                            nav.showScreen('results');
+                            firebase.listenToSession(session.code, function (nextSession) {
+                                state.currentSession = nextSession;
+                                if (state.currentScreen === 'results' && state.currentStudent) {
+                                    var nextTeams = Object.values(nextSession.teams || {});
+                                    var nextMyTeam = nextTeams.find(function (t) { return t.memberIds && t.memberIds.includes(state.currentStudent.id); });
+                                    if (nextMyTeam) {
+                                        document.getElementById('results-title').textContent = 'Your Team';
+                                        render.renderTeams([nextMyTeam]);
+                                    }
+                                }
+                            });
+                        } else {
+                            nav.showScreen('waiting');
+                        }
+                    } else {
+                        firebase.listenToSession(state.currentSession.code, function (updatedSession) {
+                            state.currentSession = updatedSession;
+                            if (updatedSession.status === 'published') {
+                                var teams = updatedSession.teams ? Object.values(updatedSession.teams) : [];
+                                var myTeam = teams.find(function (t) { return t.memberIds && t.memberIds.includes(student.id); });
+                                document.getElementById('results-title').textContent = 'Your Team';
+                                render.renderTeams(myTeam ? [myTeam] : []);
+                                nav.showScreen('results');
+                            }
+                        });
+                        nav.showScreen('waiting');
+                    }
+                } catch (err) {
+                    alert('Error saving profile: ' + err.message);
+                }
+            }
+        });
+
+        document.getElementById('btn-check-status') && document.getElementById('btn-check-status').addEventListener('click', async function () {
+            try {
+                var session = await firebase.getSessionByCode(state.currentSession.code);
+                state.currentSession = session;
+                if (session && session.status === 'published') {
+                    var teams = session.teams ? Object.values(session.teams) : [];
+                    var myTeam = teams.find(function (t) { return t.memberIds && t.memberIds.includes(state.currentStudent.id); });
+                    document.getElementById('results-title').textContent = 'Your Team';
+                    render.renderTeams(myTeam ? [myTeam] : []);
+                    nav.showScreen('results');
+                }
+            } catch (err) { console.error(err); }
+        });
+
+        document.getElementById('btn-refresh') && document.getElementById('btn-refresh').addEventListener('click', async function () {
+            try {
+                var session = await firebase.getSessionByCode(state.currentSession.code);
+                state.currentSession = session;
+                render.renderDashboard();
+            } catch (err) { console.error(err); }
+        });
+
+        document.getElementById('btn-run-matching') && document.getElementById('btn-run-matching').addEventListener('click', async function () {
+            var session = state.currentSession;
+            if (session.status === 'published') {
+                var teams = session.teams ? Object.values(session.teams) : [];
+                document.getElementById('results-title').textContent = 'All Teams';
+                var backBtn = document.getElementById('btn-back-dashboard');
+                if (backBtn) backBtn.style.display = 'block';
+                render.renderTeams(teams, true);
+                nav.showScreen('results');
+            } else {
+                try {
+                    var latestSession = await firebase.getSessionByCode(session.code);
+                    state.currentSession = latestSession;
+                    var teams = matching.runMatching(latestSession);
+                    if (teams.length === 0) {
+                        alert('No students have submitted their profiles yet!');
+                        return;
+                    }
+                    var teamsObj = {};
+                    teams.forEach(function (team) { teamsObj[team.id] = team; });
+                    await firebase.saveTeamsInDB(session.code, teamsObj);
+                    state.currentSession.teams = teamsObj;
+                    state.currentSession.status = 'published';
+                    render.renderDashboard();
+                    document.getElementById('results-title').textContent = 'All Teams';
+                    var backBtn = document.getElementById('btn-back-dashboard');
+                    if (backBtn) backBtn.style.display = 'block';
+                    render.renderTeams(teams, true);
+                    nav.showScreen('results');
+                } catch (err) {
+                    alert('Error running matching: ' + err.message);
+                }
+            }
+        });
+
+        document.getElementById('btn-back-dashboard') && document.getElementById('btn-back-dashboard').addEventListener('click', function () {
+            nav.showScreen('instructor-dashboard');
+        });
+    }
+
+    window.WHO2MEET_initEvents = initEvents;
+})();

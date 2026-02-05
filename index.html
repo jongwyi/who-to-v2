@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WHO2MEET | Find Your Perfect Team</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-inner">
+            <a href="#" id="logo-home" class="logo-text">WHO2MEET</a>
+            <button type="button" id="btn-lang-toggle" class="btn-lang" aria-label="Toggle language">EN</button>
+        </div>
+    </header>
+
+    <!-- ========================================
+        LANDING SCREEN
+    ======================================== -->
+    <main id="app">
+        <section id="landing" class="screen active">
+            <div class="container">
+                <h1 class="version-display">(1.2.0)</h1>
+                <div class="hero">
+                    <div class="hero-logo">🤝</div>
+                    <h1 class="hero-title" data-i18n="appTitle">WHO2MEET</h1>
+                    <p class="hero-subtitle" data-i18n="subtitle">Find Your Perfect Team</p>
+                </div>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="sessionCode">Session Code</label>
+                        <input type="text" id="join-code" class="form-input" placeholder="Enter 6-character code" maxlength="6">
+                    </div>
+                    <button id="btn-go-join" class="btn btn-primary btn-full" disabled data-i18n="joinSession">Join Session →</button>
+                </div>
+                <div class="divider"><span>or</span></div>
+                <button id="btn-go-create" class="btn btn-secondary btn-full" data-i18n="createSession">Create New Session (Instructor)</button>
+                <p class="hint-text" style="margin-top: 1rem; text-align: center;">
+                    <a href="#" id="btn-instructor-relogin" class="link" data-i18n="reEnterInstructor">Re-enter as Instructor →</a>
+                </p>
+                <div class="divider" style="margin-top: 1.5rem;"><span>Test</span></div>
+                <button id="btn-quick-test" class="btn btn-ghost btn-full" type="button">🧪 Quick Test (30 users)</button>
+            </div>
+        </section>
+
+
+
+        <!-- ========================================
+             INSTRUCTOR RE-LOGIN SCREEN
+        ======================================== -->
+        <section id="instructor-relogin" class="screen">
+            <div class="container">
+                <h2 data-i18n="instructorDashboard">Instructor Re-Login</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="sessionCode">Session Code</label>
+                        <input type="text" id="relogin-code" class="form-input" placeholder="Enter 6-character code" maxlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="yourName">Your Name</label>
+                        <input type="text" id="relogin-name" class="form-input" placeholder="Same name you used before">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="password">Password</label>
+                        <input type="password" id="relogin-password" class="form-input" placeholder="Your instructor password">
+                    </div>
+                    <p id="relogin-error" class="error-text"></p>
+                    <div class="nav-buttons">
+                        <button class="btn btn-ghost" data-go="landing" data-i18n="back">← Back</button>
+                        <button id="btn-instructor-login" class="btn btn-primary" disabled>Login →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             JOIN SESSION SCREEN
+        ======================================== -->
+        <section id="join-session" class="screen">
+            <div class="container">
+                <h2 data-i18n="joinSession">Join Session</h2>
+                <p class="session-info">Session Code: <strong id="display-join-code"></strong></p>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="yourName">Your Name</label>
+                        <input type="text" id="student-name" class="form-input" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="emojiOptional">Emoji (optional)</label>
+                        <input type="text" id="student-emoji" class="form-input" placeholder="e.g. 😀" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="password">Password</label>
+                        <input type="password" id="student-password" class="form-input" placeholder="Create a simple password">
+                    </div>
+                    <p id="join-error" class="error-text"></p>
+                    <div class="nav-buttons">
+                        <button class="btn btn-ghost" data-go="landing" data-i18n="back">← Back</button>
+                        <button id="btn-join-session" class="btn btn-primary" disabled data-i18n="continue">Continue →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             CREATE SESSION SCREEN
+        ======================================== -->
+
+        <section id="create-session" class="screen">
+            <div class="container">
+                <h2 data-i18n="createSession">Create Session</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="sessionName">Session Name</label>
+                        <input type="text" id="session-name" class="form-input" placeholder="e.g., CS101 Spring 2024">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="yourNameInstructor">Your Name (Instructor)</label>
+                        <input type="text" id="instructor-name" class="form-input" placeholder="Enter your name">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="emojiOptional">Emoji (optional)</label>
+                        <input type="text" id="instructor-emoji" class="form-input" placeholder="e.g. 👩‍🏫" maxlength="4">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="password">Password</label>
+                        <input type="password" id="instructor-password" class="form-input" placeholder="Create a password">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="teamSize">Team Size</label>
+                        <input type="number" id="team-size" class="form-input" value="4" min="2" max="10">
+                    </div>
+                    <h4 class="section-title" data-i18n="roleTags">Role Tags</h4>
+                    <p class="hint-text">Define the roles students can pick from (they will choose 2).</p>
+                    <div id="create-role-tags-list" class="create-tags-list"></div>
+                    <button type="button" id="btn-add-role-tag" class="btn btn-ghost btn-small">+ Add role</button>
+                    <h4 class="section-title" style="margin-top: 1.25rem;" data-i18n="interestTags">Interest Tags</h4>
+                    <p class="hint-text">Define the interest categories students can pick from.</p>
+                    <div id="create-interest-tags-list" class="create-tags-list"></div>
+                    <button type="button" id="btn-add-interest-tag" class="btn btn-ghost btn-small">+ Add interest</button>
+                    <h4 class="section-title" data-i18n="matchingWeights">Matching Weights</h4>
+                    <p class="hint-text" data-i18n="weightHint">Adjust how much each factor matters (must sum to 100%)</p>
+                    <div class="weight-slider">
+                        <div class="weight-header">
+                            <span>💼 <span data-i18n="roleDiversity">Role Diversity</span></span>
+                            <span id="weight-role-value">50%</span>
+                        </div>
+                        <input type="range" id="weight-role" min="0" max="100" value="50">
+                    </div>
+                    <div class="weight-slider">
+                        <div class="weight-header">
+                            <span>🎯 <span data-i18n="interestSimilarity">Interest Similarity</span></span>
+                            <span id="weight-interest-value">50%</span>
+                        </div>
+                        <input type="range" id="weight-interest" min="0" max="100" value="50">
+                    </div>
+                    <p id="create-error" class="error-text"></p>
+                    <div class="nav-buttons">
+                        <button class="btn btn-ghost" data-go="landing" data-i18n="back">← Back</button>
+                        <button id="btn-create-session" class="btn btn-primary" disabled data-i18n="createSessionBtn">Create Session →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             PROFILE INPUT SCREEN
+        ======================================== -->
+        <section id="profile-input" class="screen">
+            <div class="container">
+                <div class="steps">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-dot" data-step="3"></div>
+                </div>
+                <h3 id="profile-step-title">Step 1/3 — Your Roles</h3>
+                <div class="card">
+                    <div id="profile-step-1" class="profile-step active">
+                        <p class="step-instruction">Pick exactly two roles. The first is your <strong>first priority</strong>, the second is your <strong>second priority</strong>.</p>
+                        <div class="tag-grid" id="role-tags"></div>
+                        <p id="role-priority-summary" class="hint-text" style="margin-top: 0.75rem; min-height: 1.5em;"></p>
+                    </div>
+                    <div id="profile-step-2" class="profile-step">
+                        <p class="step-instruction">What areas interest you? (Select all that apply)</p>
+                        <div class="tag-grid" id="interest-tags"></div>
+                        <div id="custom-interest-group" class="form-group" style="display: none; margin-top: 1rem;">
+                            <label class="form-label">Your Interest</label>
+                            <input type="text" id="custom-interest" class="form-input" placeholder="Type your interest...">
+                        </div>
+                    </div>
+                    <div id="profile-step-3" class="profile-step">
+                        <p class="step-instruction">One line to your future teammates:</p>
+                        <textarea id="message-to-team" class="form-input form-textarea" placeholder="Looking forward to building something cool together!"></textarea>
+                    </div>
+                    <div class="nav-buttons">
+                        <button id="btn-profile-back" class="btn btn-ghost">← Back</button>
+                        <button id="btn-profile-next" class="btn btn-primary" disabled>Next →</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             WAITING SCREEN
+        ======================================== -->
+        <section id="waiting" class="screen">
+            <div class="container">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text" data-i18n="waiting">Waiting for teams to be assigned...</p>
+                    <button id="btn-check-status" class="btn btn-secondary" data-i18n="checkStatus">Check Status</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             INSTRUCTOR DASHBOARD SCREEN
+        ======================================== -->
+        <section id="instructor-dashboard" class="screen">
+            <div class="container container-wide">
+                <h2 data-i18n="instructorDashboard">Instructor Dashboard</h2>
+                <div class="session-code-display">
+                    <p class="session-code-label" data-i18n="shareCode">Share this code with your students</p>
+                    <p class="session-code-value" id="dashboard-code"></p>
+                </div>
+                <div class="card">
+                    <h4 id="dashboard-session-name"></h4>
+                    <p class="session-details" id="dashboard-details"></p>
+                    <p class="session-status" id="dashboard-status"></p>
+                    <p class="student-count" id="dashboard-student-count">Students joined: 0</p>
+                    <div class="nav-buttons">
+                        <button id="btn-refresh" class="btn btn-secondary" data-i18n="refresh">Refresh</button>
+                        <button id="btn-run-matching" class="btn btn-primary">🎲 Run Matching</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             RESULTS SCREEN
+        ======================================== -->
+        <section id="results" class="screen">
+            <div class="container container-wide">
+                <h2 id="results-title">Your Team</h2>
+                <div id="teams-container"></div>
+                <div class="nav-buttons">
+                    <button id="btn-back-dashboard" class="btn btn-ghost" style="display: none;" data-i18n="backToDashboard">← Back to Dashboard</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script type="module" src="js/main.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
