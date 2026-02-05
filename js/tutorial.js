@@ -142,6 +142,7 @@ export function refreshIfVisible() {
 
 export function initTutorial() {
     const btnViewTutorial = document.getElementById('btn-view-tutorial');
+    const btnViewTutorialInstructor = document.getElementById('btn-view-tutorial-instructor');
     const roleModal = document.getElementById('tutorial-role-modal');
     const roleClose = document.getElementById('tutorial-role-close');
     const stepClose = document.getElementById('tutorial-step-close');
@@ -149,15 +150,15 @@ export function initTutorial() {
     const prevBtn = document.getElementById('tutorial-prev');
     const nextBtn = document.getElementById('tutorial-next');
 
-    if (btnViewTutorial) {
-        btnViewTutorial.addEventListener('click', (e) => {
-            e.preventDefault();
-            const role = state.landingRole;
-            if (role === 'participant' || role === 'instructor') {
-                showTutorialForRole(role);
-            }
-        });
+    function handleViewTutorial(e) {
+        e.preventDefault();
+        const role = state.landingRole;
+        if (role === 'participant' || role === 'instructor') {
+            showTutorialForRole(role);
+        }
     }
+    if (btnViewTutorial) btnViewTutorial.addEventListener('click', handleViewTutorial);
+    if (btnViewTutorialInstructor) btnViewTutorialInstructor.addEventListener('click', handleViewTutorial);
 
     if (roleClose) roleClose.addEventListener('click', hideRoleModal);
     if (stepClose) stepClose.addEventListener('click', hideStepModal);

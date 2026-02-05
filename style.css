@@ -287,6 +287,33 @@ body {
     border-color: var(--accent);
 }
 .tutorial-entry-icon { font-size: 1.25rem; }
+
+/* Tutorial box — green box below session form (student & instructor) */
+.tutorial-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-lg);
+    margin-top: var(--space-md);
+    background: rgba(34, 139, 34, 0.08);
+    border: 1px solid rgba(34, 139, 34, 0.35);
+    border-radius: var(--radius);
+    color: #228b22;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.tutorial-box:hover {
+    background: rgba(34, 139, 34, 0.15);
+    border-color: #228b22;
+    color: #1a6b1a;
+}
+.tutorial-box .tutorial-box-label { color: inherit; }
+.tutorial-box .tutorial-box-link { font-weight: 600; text-decoration: underline; }
 .link:hover { text-decoration: underline; }
 .error-text { font-size: 0.8125rem; color: #e03e3e; margin-top: var(--space-sm); }
 

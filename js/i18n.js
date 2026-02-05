@@ -1,6 +1,6 @@
 const translations = {
     en: {
-        appTitle: 'WHO2MEET',
+        appTitle: 'who2meet',
         subtitle: 'Find Your Perfect Team',
         sessionCode: 'Session Code',
         joinSession: 'Join Session',
@@ -89,12 +89,12 @@ const translations = {
         stepMessageToTeam: 'Message to Team'
     },
     ko: {
-        appTitle: 'WHO2MEET',
+        appTitle: 'who2meet',
         subtitle: '완벽한 팀을 만나세요',
         sessionCode: '세션 코드',
         joinSession: '세션 참여',
         createSession: '새 세션 만들기 (강사)',
-        reEnterInstructor: '강사로 다시 들어가기 →',
+        reEnterInstructor: '이미 만들어진 방으로 다시 들어가기 →',
         yourName: '이름',
         password: '비밀번호',
         emojiOptional: '이모지 (선택)',
