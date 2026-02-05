@@ -1,8 +1,11 @@
 const functions = require('firebase-functions');
+const { defineSecret } = require('firebase-functions/params');
 const admin = require('firebase-admin');
 const { Resend } = require('resend');
 
 admin.initializeApp();
+
+const resendApiKey = defineSecret('RESEND_API_KEY');
 
 const db = admin.database();
 
@@ -167,7 +170,7 @@ async function captureScreenshot(html) {
 }
 
 exports.sendTeamResultsEmail = functions
-  .runWith({ memory: '1GB', timeoutSeconds: 60 })
+  .runWith({ memory: '1GB', timeoutSeconds: 60, secrets: [resendApiKey] })
   .https.onCall(async (data, context) => {
     const { email, sessionCode } = data || {};
 
@@ -210,9 +213,9 @@ exports.sendTeamResultsEmail = functions
       console.warn('Screenshot skipped:', e.message);
     }
 
-    const apiKey = process.env.RESEND_API_KEY || functions.config().resend?.api_key;
+    const apiKey = resendApiKey.value();
     if (!apiKey) {
-      console.error('Resend API key not configured. Set RESEND_API_KEY env or firebase functions:config:set resend.api_key');
+      console.error('Resend API key not configured. Add RESEND_API_KEY secret in Secret Manager.');
       throw new functions.https.HttpsError('internal', 'Email service not configured.');
     }
 
