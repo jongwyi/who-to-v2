@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="grad-pink-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#DFC3FC;stop-opacity:0.85"/>
+      <stop offset="100%" style="stop-color:#90C5FC;stop-opacity:0.85"/>
+    </linearGradient>
+    <linearGradient id="grad-blue-pink" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#90C5FC;stop-opacity:0.8"/>
+      <stop offset="100%" style="stop-color:#DFC3FC;stop-opacity:0.8"/>
+    </linearGradient>
+    <radialGradient id="grad-orb" cx="30%" cy="30%" r="70%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.4"/>
+      <stop offset="70%" style="stop-color:#DFC3FC;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#90C5FC;stop-opacity:0.5"/>
+    </radialGradient>
+    <radialGradient id="grad-orb2" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" style="stop-color:#fff;stop-opacity:0.35"/>
+      <stop offset="60%" style="stop-color:#90C5FC;stop-opacity:0.55"/>
+      <stop offset="100%" style="stop-color:#DFC3FC;stop-opacity:0.45"/>
+    </radialGradient>
+    <linearGradient id="grad-cream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFF9E6;stop-opacity:0.7"/>
+      <stop offset="50%" style="stop-color:#DFC3FC;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#90C5FC;stop-opacity:0.6"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <!-- Circles -->
+  <circle cx="120" cy="180" r="45" fill="url(#grad-orb)" opacity="0.9"/>
+  <circle cx="380" cy="120" r="28" fill="url(#grad-orb2)" opacity="0.85"/>
+  <circle cx="620" cy="320" r="55" fill="url(#grad-orb)" opacity="0.88"/>
+  <circle cx="920" cy="180" r="35" fill="url(#grad-orb2)" opacity="0.82"/>
+  <circle cx="180" cy="520" r="40" fill="url(#grad-orb)" opacity="0.86"/>
+  <circle cx="480" cy="620" r="32" fill="url(#grad-orb2)" opacity="0.84"/>
+  <circle cx="780" cy="520" r="48" fill="url(#grad-orb)" opacity="0.9"/>
+  <circle cx="1050" cy="480" r="25" fill="url(#grad-orb2)" opacity="0.8"/>
+  <circle cx="250" cy="350" r="22" fill="url(#grad-orb)" opacity="0.75"/>
+  <circle cx="850" cy="280" r="30" fill="url(#grad-orb2)" opacity="0.78"/>
+  <!-- Stars (5-pointed) -->
+  <polygon points="280,90 295,135 342,135 305,165 318,212 280,185 242,212 255,165 218,135 265,135" fill="url(#grad-pink-blue)" opacity="0.85"/>
+  <polygon points="720,140 732,175 770,175 740,198 750,236 720,215 690,236 700,198 670,175 708,175" fill="url(#grad-blue-pink)" opacity="0.82"/>
+  <polygon points="150,420 162,455 198,455 170,478 180,514 150,495 120,514 130,478 102,455 138,455" fill="url(#grad-pink-blue)" opacity="0.8"/>
+  <polygon points="950,380 960,408 992,408 968,426 976,458 950,442 924,458 932,426 908,408 940,408" fill="url(#grad-cream)" opacity="0.78"/>
+  <polygon points="520,80 528,108 558,108 535,128 542,158 520,142 498,158 505,128 482,108 512,108" fill="url(#grad-blue-pink)" opacity="0.83"/>
+  <!-- Diamonds -->
+  <polygon points="400,280 440,340 400,400 360,340" fill="url(#grad-pink-blue)" opacity="0.8"/>
+  <polygon points="800,400 835,455 800,510 765,455" fill="url(#grad-orb2)" opacity="0.78"/>
+  <polygon points="100,250 130,290 100,330 70,290" fill="url(#grad-blue-pink)" opacity="0.75"/>
+  <polygon points="1100,300 1125,335 1100,370 1075,335" fill="url(#grad-pink-blue)" opacity="0.72"/>
+  <polygon points="600,550 630,590 600,630 570,590" fill="url(#grad-cream)" opacity="0.76"/>
+  <!-- Triangles -->
+  <polygon points="50,150 100,150 75,100" fill="url(#grad-blue-pink)" opacity="0.78"/>
+  <polygon points="1150,550 1200,550 1175,500" fill="url(#grad-pink-blue)" opacity="0.75"/>
+  <polygon points="350,650 400,650 375,600" fill="url(#grad-orb)" opacity="0.8"/>
+  <polygon points="900,100 950,100 925,50" fill="url(#grad-cream)" opacity="0.77"/>
+  <!-- Exclamation mark shape -->
+  <g opacity="0.8" transform="translate(1050, 650)">
+    <rect x="0" y="0" width="12" height="28" rx="4" fill="url(#grad-pink-blue)"/>
+    <circle cx="6" cy="34" r="5" fill="url(#grad-pink-blue)"/>
+  </g>
+</svg>

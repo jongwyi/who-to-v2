@@ -6,8 +6,10 @@
     --text-primary: #18181b;
     --text-secondary: #71717a;
     --border: #e4e4e7;
-    --accent: #2563eb;
-    --accent-hover: #1d4ed8;
+    --accent: #90C5FC;
+    --accent-hover: #7BB5F8;
+    --accent-gradient: linear-gradient(135deg, #DFC3FC, #90C5FC);
+    --accent-gradient-soft: linear-gradient(135deg, rgba(223,195,252,0.15), rgba(144,197,252,0.15));
     --radius: 0.5rem;
     --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     --shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -32,6 +34,10 @@ html { font-size: clamp(14px, 2.5vw, 16px); }
 body {
     font-family: var(--font);
     background: var(--bg-page);
+    background-image: url("assets/bg-shapes.svg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     color: var(--text-primary);
     min-height: 100vh;
     line-height: 1.5;
@@ -110,7 +116,7 @@ body {
 .screen.active { display: flex; flex-direction: column; animation: fadeIn 0.2s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Clean minimal background — no decorative shapes */
+/* SVG background applied via body; bg-shapes placeholder kept for structure */
 .screen-with-shapes { position: relative; }
 .screen-with-shapes .container { width: 100%; }
 .bg-shapes { display: none; }
@@ -137,7 +143,7 @@ body {
     width: 2.5rem;
     height: 3px;
     margin: 0 auto var(--space-md);
-    background: var(--accent);
+    background: var(--accent-gradient);
     border-radius: 2px;
 }
 .hero-title { font-size: clamp(1.5rem, 5vw, 1.875rem); font-weight: 700; color: var(--text-primary); letter-spacing: -0.03em; line-height: 1.2; }
@@ -171,7 +177,7 @@ body {
 .form-input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+    box-shadow: 0 0 0 2px rgba(144, 197, 252, 0.35);
 }
 .form-textarea { min-height: 5rem; resize: vertical; }
 
@@ -189,7 +195,7 @@ body {
 }
 .btn-full { width: 100%; }
 .btn-primary {
-    background: var(--accent);
+    background: var(--accent-gradient);
     color: #fff;
 }
 .btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
@@ -228,7 +234,7 @@ body {
     transition: background 0.15s, border-color 0.15s;
 }
 .tutorial-entry-link:hover {
-    background: rgba(37, 99, 235, 0.06);
+    background: rgba(144, 197, 252, 0.12);
     border-color: var(--accent);
 }
 /* Tutorial box — neutral professional style */
@@ -311,7 +317,7 @@ body {
     transition: 0.2s;
     box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
-.param-toggle:checked + .param-toggle-slider { background: var(--accent); }
+.param-toggle:checked + .param-toggle-slider { background: var(--accent-gradient); }
 .param-toggle:checked + .param-toggle-slider::before { transform: translateX(1.25rem); }
 .param-toggle:disabled + .param-toggle-slider { opacity: 0.6; cursor: not-allowed; }
 .param-tile-form .create-tags-list { margin-bottom: var(--space-xs); }
@@ -379,7 +385,7 @@ body {
     font-size: 0.875rem;
 }
 .tag-item:hover { border-color: var(--accent); }
-.tag-item.selected { background: rgba(37, 99, 235, 0.1); border-color: var(--accent); color: var(--accent); }
+.tag-item.selected { background: rgba(144, 197, 252, 0.2); border-color: var(--accent); color: var(--accent); }
 .tag-priority { font-size: 0.6875rem; color: var(--text-secondary); margin-left: var(--space-xs); }
 
 .steps { display: flex; gap: var(--space-sm); margin-bottom: var(--space-md); }
@@ -390,7 +396,7 @@ body {
     background: var(--border);
     transition: background 0.2s;
 }
-.step-dot.active { background: var(--accent); }
+.step-dot.active { background: var(--accent-gradient); }
 .step-dot.completed { background: var(--text-secondary); }
 .profile-step { display: none; }
 .profile-step.active { display: block; }
@@ -419,7 +425,7 @@ body {
     height: clamp(2rem, 8vw, 2.5rem);
     margin: 0 auto var(--space-md);
     border: 3px solid var(--border);
-    border-top-color: var(--accent);
+    border-top-color: #90C5FC;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -507,7 +513,7 @@ body {
     font-weight: 600;
     text-transform: uppercase;
     color: var(--accent);
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(144, 197, 252, 0.2);
     border-radius: var(--radius);
 }
 .member-card-new { border-left: 3px solid var(--accent); }
@@ -520,7 +526,7 @@ body {
     font-size: 0.8125rem;
 }
 .member-extro-tag-blue {
-    background: rgba(37, 99, 235, 0.1);
+    background: rgba(144, 197, 252, 0.2);
     color: var(--accent);
     border: 1px solid var(--accent);
 }
@@ -546,7 +552,7 @@ body {
     color: var(--text-secondary);
 }
 .results-cute .team-shared-tag {
-    background: rgba(37, 99, 235, 0.08);
+    background: rgba(144, 197, 252, 0.2);
     color: var(--accent);
     border-radius: var(--radius);
     padding: var(--space-xs) var(--space-sm);
@@ -560,10 +566,10 @@ body {
 }
 .results-cute .member-card-new {
     border-left: 3px solid var(--accent);
-    background: rgba(37, 99, 235, 0.04);
+    background: rgba(144, 197, 252, 0.08);
 }
 .results-cute .member-new-badge {
-    background: rgba(37, 99, 235, 0.12);
+    background: rgba(144, 197, 252, 0.2);
     color: var(--accent);
     border-radius: var(--radius);
     padding: var(--space-xs) var(--space-sm);
@@ -809,7 +815,7 @@ body {
 }
 .tutorial-role-card:hover {
     border-color: var(--accent);
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    box-shadow: 0 2px 8px rgba(144, 197, 252, 0.25);
 }
 .tutorial-role-icon { font-size: 2.5rem; }
 .tutorial-role-title { font-size: 1rem; font-weight: 600; }
@@ -831,7 +837,7 @@ body {
     background: var(--border);
     transition: background 0.2s;
 }
-.tutorial-progress-dot.active { background: var(--accent); }
+.tutorial-progress-dot.active { background: var(--accent-gradient); }
 .tutorial-progress-dot.completed { background: var(--text-secondary); }
 .tutorial-step-content { margin-bottom: var(--space-lg); }
 .tutorial-step-image {
