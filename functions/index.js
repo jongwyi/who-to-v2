@@ -213,7 +213,7 @@ exports.sendTeamResultsEmail = functions
       console.warn('Screenshot skipped:', e.message);
     }
 
-    const apiKey = resendApiKey.value();
+    const apiKey = resendApiKey.value() || process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error('Resend API key not configured. Add RESEND_API_KEY secret in Secret Manager.');
       throw new functions.https.HttpsError('internal', 'Email service not configured.');
@@ -231,6 +231,11 @@ exports.sendTeamResultsEmail = functions
     const sessionName = session.name || 'Session';
     const subject = `[WHO2MEET] Team Results — ${sessionName}`;
 
+    // Resend sandbox (onboarding@resend.dev) only allows: delivered@resend.dev, bounced@resend.dev, complained@resend.dev
+    if (!emailTrimmed.endsWith('@resend.dev')) {
+      console.warn('Resend sandbox: sending to non-@resend.dev may fail. Use delivered@resend.dev for testing, or verify domain for production.');
+    }
+
     const { error } = await resend.emails.send({
       from: 'WHO2MEET <onboarding@resend.dev>',
       to: emailTrimmed,
@@ -241,7 +246,8 @@ exports.sendTeamResultsEmail = functions
 
     if (error) {
       console.error('Resend error:', error);
-      throw new functions.https.HttpsError('internal', 'Failed to send email. Please try again.');
+      const errMsg = (error && error.message) ? error.message : 'Unknown error';
+      throw new functions.https.HttpsError('internal', `Failed to send email: ${errMsg}`);
     }
 
     return { success: true, message: 'Email sent.' };

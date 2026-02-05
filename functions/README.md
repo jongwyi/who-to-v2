@@ -32,3 +32,12 @@ Callable function that sends team matching results to an email address.
 - **Screenshot**: Placeholder for future implementation (Puppeteer or external API)
 - **Validation**: Email format, session code (6 chars), session existence, teams presence
 
+### Resend sandbox
+
+When using `onboarding@resend.dev` (default), you can only send to:
+- `delivered@resend.dev` — test successful delivery
+- `bounced@resend.dev` — test bounce
+- `complained@resend.dev` — test spam complaint
+
+For production (sending to any email), verify your domain in [Resend Dashboard](https://resend.com/domains) and update the `from` address.
+
