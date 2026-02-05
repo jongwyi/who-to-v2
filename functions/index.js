@@ -232,6 +232,7 @@ exports.sendTeamResultsEmail = functions
     const subject = `[WHO2MEET] Team Results — ${sessionName}`;
 
     // Resend sandbox (onboarding@resend.dev) only allows: delivered@resend.dev, bounced@resend.dev, complained@resend.dev
+    // v1.1 - force redeploy for process.env fallback + error surfacing
     if (!emailTrimmed.endsWith('@resend.dev')) {
       console.warn('Resend sandbox: sending to non-@resend.dev may fail. Use delivered@resend.dev for testing, or verify domain for production.');
     }
