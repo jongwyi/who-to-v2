@@ -13,39 +13,6 @@
     crossorigin="anonymous"></script>
 </head>
 <body>
-    <!-- Shared SVG gradient defs for glass shapes -->
-    <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0">
-        <defs>
-            <linearGradient id="glass-pink" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#ffe4ec" stop-opacity="0.9"/>
-                <stop offset="50%" stop-color="#ffcce0" stop-opacity="0.7"/>
-                <stop offset="100%" stop-color="#ffb3d9" stop-opacity="0.6"/>
-            </linearGradient>
-            <linearGradient id="glass-blue" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#d4e9ff" stop-opacity="0.9"/>
-                <stop offset="50%" stop-color="#b8e0ff" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#a3d4ff" stop-opacity="0.65"/>
-            </linearGradient>
-            <linearGradient id="glass-purple" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#e8dcff" stop-opacity="0.9"/>
-                <stop offset="50%" stop-color="#d4c4f7" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#c9b3ff" stop-opacity="0.65"/>
-            </linearGradient>
-            <linearGradient id="glass-cyan" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#d4f7f4" stop-opacity="0.9"/>
-                <stop offset="50%" stop-color="#b5f0e8" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#9ee8e0" stop-opacity="0.65"/>
-            </linearGradient>
-            <linearGradient id="glass-peach" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stop-color="#fff0e6" stop-opacity="0.9"/>
-                <stop offset="50%" stop-color="#ffe0cc" stop-opacity="0.75"/>
-                <stop offset="100%" stop-color="#ffd1b3" stop-opacity="0.65"/>
-            </linearGradient>
-            <filter id="glass-shadow" x="-20%" y="-20%" width="140%" height="140%">
-                <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="rgba(0,0,0,0.08)" flood-opacity="1"/>
-            </filter>
-        </defs>
-    </svg>
     <header class="app-header">
         <div class="header-inner">
             <a href="#" id="logo-home" class="logo-text">who2meet</a>
@@ -61,20 +28,11 @@
     ======================================== -->
     <main id="app">
         <section id="landing" class="screen active screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <h1 class="version-display">(final ^^)</h1>
                 <div class="hero">
-                    <div class="hero-logo">🤝</div>
+                    <div class="hero-logo" aria-hidden="true"></div>
                     <h1 class="hero-title" data-i18n="appTitle">WHO2MEET</h1>
                     <p class="hero-subtitle" data-i18n="subtitle">Find Your Perfect Team</p>
                 </div>
@@ -92,7 +50,6 @@
                         <button id="btn-go-join" class="btn btn-primary btn-full" disabled data-i18n="joinSession">세션 참가 →</button>
                     </div>
                     <a href="#" id="btn-view-tutorial" class="tutorial-box" aria-label="View Tutorial">
-                        <span class="tutorial-entry-icon">📖</span>
                         <span class="tutorial-box-label" data-i18n="newToService">처음이신가요?</span>
                         <span class="tutorial-box-link" data-i18n="viewTutorial">튜토리얼 보기 →</span>
                     </a>
@@ -104,7 +61,6 @@
                         <a href="#" id="btn-instructor-relogin" class="link" data-i18n="reEnterInstructor">이미 세션을 생성하셨나요? 강사로 다시 로그인 →</a>
                     </p>
                     <a href="#" id="btn-view-tutorial-instructor" class="tutorial-box" aria-label="View Tutorial">
-                        <span class="tutorial-entry-icon">📖</span>
                         <span class="tutorial-box-label" data-i18n="newToService">처음이신가요?</span>
                         <span class="tutorial-box-link" data-i18n="viewTutorial">튜토리얼 보기 →</span>
                     </a>
@@ -119,16 +75,7 @@
              INSTRUCTOR RE-LOGIN SCREEN
         ======================================== -->
         <section id="instructor-relogin" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <h2 data-i18n="instructorDashboard">Instructor Re-Login</h2>
                 <div class="card">
@@ -157,16 +104,7 @@
              JOIN SESSION SCREEN
         ======================================== -->
         <section id="join-session" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <h2 data-i18n="joinSession">Join Session</h2>
                 <p class="session-info">Session Code: <strong id="display-join-code"></strong></p>
@@ -197,16 +135,7 @@
         ======================================== -->
 
         <section id="create-session" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <h2 data-i18n="createSession">Create Session</h2>
                 <div class="card">
@@ -251,16 +180,7 @@
              PROFILE INPUT SCREEN
         ======================================== -->
         <section id="profile-input" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <div class="steps" id="profile-steps-dots"></div>
                 <h3 id="profile-step-title">Step 1/3 — Your Roles</h3>
@@ -301,16 +221,7 @@
              WAITING SCREEN
         ======================================== -->
         <section id="waiting" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container">
                 <div class="loading">
                     <div class="loading-spinner"></div>
@@ -324,16 +235,7 @@
              INSTRUCTOR DASHBOARD SCREEN
         ======================================== -->
         <section id="instructor-dashboard" class="screen screen-with-shapes">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container container-wide">
                 <h2 data-i18n="instructorDashboard">Instructor Dashboard</h2>
                 <div class="session-code-display">
@@ -361,16 +263,7 @@
              RESULTS SCREEN
         ======================================== -->
         <section id="results" class="screen screen-with-shapes results-cute">
-            <div class="bg-shapes" aria-hidden="true">
-                <svg class="shape shape-circle shape-1" viewBox="0 0 80 80" fill="url(#glass-pink)" filter="url(#glass-shadow)"><circle cx="40" cy="40" r="36"/></svg>
-                <svg class="shape shape-diamond shape-2" viewBox="0 0 60 60" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M30 4 L56 30 L30 56 L4 30 Z"/></svg>
-                <svg class="shape shape-star shape-3" viewBox="0 0 64 64" fill="url(#glass-purple)" filter="url(#glass-shadow)"><path d="M32 8 L38 24 L54 26 L42 38 L46 54 L32 46 L18 54 L22 38 L10 26 L26 24 Z"/></svg>
-                <svg class="shape shape-circle shape-4" viewBox="0 0 60 60" fill="url(#glass-cyan)" filter="url(#glass-shadow)"><circle cx="30" cy="30" r="26"/></svg>
-                <svg class="shape shape-diamond shape-5" viewBox="0 0 48 48" fill="url(#glass-peach)" filter="url(#glass-shadow)"><path d="M24 2 L44 24 L24 46 L4 24 Z"/></svg>
-                <svg class="shape shape-triangle shape-6" viewBox="0 0 56 56" fill="url(#glass-pink)" filter="url(#glass-shadow)"><path d="M28 8 L52 48 L4 48 Z"/></svg>
-                <svg class="shape shape-star shape-7" viewBox="0 0 48 48" fill="url(#glass-blue)" filter="url(#glass-shadow)"><path d="M24 4 L28 18 L42 20 L32 30 L36 44 L24 36 L12 44 L16 30 L6 20 L20 18 Z"/></svg>
-                <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
-            </div>
+            <div class="bg-shapes" aria-hidden="true"></div>
             <div class="container container-wide">
                 <h2 id="results-title">Your Team</h2>
                 <div id="teams-container"></div>
