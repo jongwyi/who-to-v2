@@ -7,6 +7,7 @@ export const state = {
     isInstructor: false,
     selectedRoles: [],
     selectedInterests: [],
+    extroversionScore: 5,
     customInterest: '',
     messageToTeam: ''
 };

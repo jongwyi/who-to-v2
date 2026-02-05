@@ -12,6 +12,7 @@ import * as tutorial from './tutorial.js';
 import * as landingRole from './landing-role.js';
 import * as copyserial from './copyserial.js';
 import * as emojiPicker from './emoji-picker.js';
+import * as params from './params.js';
 
 firebase.initFirebase(firebaseConfig);
 
@@ -28,7 +29,8 @@ window.WHO2MEET = {
     tutorial,
     landingRole,
     copyserial,
-    emojiPicker
+    emojiPicker,
+    params
 };
 
 document.addEventListener('DOMContentLoaded', () => {

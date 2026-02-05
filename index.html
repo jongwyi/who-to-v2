@@ -230,29 +230,13 @@
                         <label class="form-label" data-i18n="teamSize">Team Size</label>
                         <input type="number" id="team-size" class="form-input" value="4" min="2" max="10">
                     </div>
-                    <h4 class="section-title" data-i18n="roleTags">Role Tags</h4>
-                    <p class="hint-text">Define the roles students can pick from (they will choose 2).</p>
-                    <div id="create-role-tags-list" class="create-tags-list"></div>
-                    <button type="button" id="btn-add-role-tag" class="btn btn-ghost btn-small">+ Add role</button>
-                    <h4 class="section-title" style="margin-top: 1.25rem;" data-i18n="interestTags">Interest Tags</h4>
-                    <p class="hint-text">Define the interest categories students can pick from.</p>
-                    <div id="create-interest-tags-list" class="create-tags-list"></div>
-                    <button type="button" id="btn-add-interest-tag" class="btn btn-ghost btn-small">+ Add interest</button>
-                    <h4 class="section-title" data-i18n="matchingWeights">Matching Weights</h4>
-                    <p class="hint-text" data-i18n="weightHint">Adjust how much each factor matters (must sum to 100%)</p>
-                    <div class="weight-slider">
-                        <div class="weight-header">
-                            <span>💼 <span data-i18n="roleDiversity">Role Diversity</span></span>
-                            <span id="weight-role-value">50%</span>
-                        </div>
-                        <input type="range" id="weight-role" min="0" max="100" value="50">
-                    </div>
-                    <div class="weight-slider">
-                        <div class="weight-header">
-                            <span>🎯 <span data-i18n="interestSimilarity">Interest Similarity</span></span>
-                            <span id="weight-interest-value">50%</span>
-                        </div>
-                        <input type="range" id="weight-interest" min="0" max="100" value="50">
+                    <h4 class="section-title" data-i18n="matchingParams">Matching Parameters</h4>
+                    <p class="hint-text" data-i18n="paramHint">Select at least 2 parameters. Toggle ON to configure.</p>
+                    <div id="param-tiles-scroll" class="param-tiles-scroll"></div>
+                    <button type="button" id="btn-param-done" class="btn btn-secondary btn-small" data-i18n="paramSettingsDone">설정 완료</button>
+                    <div id="weight-sliders-container" class="weight-sliders-wrap" style="display: none;">
+                        <h4 class="section-title" style="margin-top: 1.25rem;" data-i18n="matchingWeights">Matching Weights</h4>
+                        <p class="hint-text" data-i18n="weightHint">Adjust how much each factor matters (must sum to 100%)</p>
                     </div>
                     <p id="create-error" class="error-text"></p>
                     <div class="nav-buttons">
@@ -278,19 +262,15 @@
                 <svg class="shape shape-circle shape-8" viewBox="0 0 44 44" fill="url(#glass-purple)" filter="url(#glass-shadow)"><circle cx="22" cy="22" r="20"/></svg>
             </div>
             <div class="container">
-                <div class="steps">
-                    <div class="step-dot active" data-step="1"></div>
-                    <div class="step-dot" data-step="2"></div>
-                    <div class="step-dot" data-step="3"></div>
-                </div>
+                <div class="steps" id="profile-steps-dots"></div>
                 <h3 id="profile-step-title">Step 1/3 — Your Roles</h3>
                 <div class="card">
-                    <div id="profile-step-1" class="profile-step active">
+                    <div id="profile-step-1" class="profile-step active" data-step-type="role">
                         <p class="step-instruction">Pick exactly two roles. The first is your <strong>first priority</strong>, the second is your <strong>second priority</strong>.</p>
                         <div class="tag-grid" id="role-tags"></div>
                         <p id="role-priority-summary" class="hint-text" style="margin-top: 0.75rem; min-height: 1.5em;"></p>
                     </div>
-                    <div id="profile-step-2" class="profile-step">
+                    <div id="profile-step-2" class="profile-step" data-step-type="interest">
                         <p class="step-instruction">What areas interest you? (Select all that apply)</p>
                         <div class="tag-grid" id="interest-tags"></div>
                         <div id="custom-interest-group" class="form-group" style="display: none; margin-top: 1rem;">
@@ -298,7 +278,14 @@
                             <input type="text" id="custom-interest" class="form-input" placeholder="Type your interest...">
                         </div>
                     </div>
-                    <div id="profile-step-3" class="profile-step">
+                    <div id="profile-step-extroversion" class="profile-step" data-step-type="extroversion">
+                        <p class="step-instruction" data-i18n="extroversionLabel">How extroverted are you? (0 = introverted, 10 = extroverted)</p>
+                        <div class="extroversion-slider-wrap">
+                            <input type="range" id="extroversion-slider" class="extroversion-slider" min="0" max="10" value="5" step="1">
+                            <span id="extroversion-value" class="extroversion-value">5</span>
+                        </div>
+                    </div>
+                    <div id="profile-step-message" class="profile-step" data-step-type="message">
                         <p class="step-instruction">One line to your future teammates:</p>
                         <textarea id="message-to-team" class="form-input form-textarea" placeholder="Looking forward to building something cool together!"></textarea>
                     </div>
@@ -388,6 +375,7 @@
                 <h2 id="results-title">Your Team</h2>
                 <div id="teams-container"></div>
                 <div class="nav-buttons">
+                    <button id="btn-email-results" class="btn btn-secondary" data-i18n="emailResultsBtn">이메일로 받기</button>
                     <button id="btn-back-dashboard" class="btn btn-ghost" style="display: none;" data-i18n="backToDashboard">← Back to Dashboard</button>
                 </div>
             </div>
@@ -432,6 +420,19 @@
                     <span class="tutorial-role-desc" data-i18n="studentDesc">Joins sessions and selects roles</span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <!-- Email Results Modal -->
+    <div id="email-results-overlay" class="email-results-overlay" aria-hidden="true">
+        <div class="email-results-modal">
+            <button type="button" class="email-results-close" id="email-results-close" aria-label="닫기">×</button>
+            <h3 class="email-results-title" data-i18n="emailResultsTitle">이메일로 결과 받기</h3>
+            <p class="email-results-desc" data-i18n="emailResultsDesc">결과 화면이 포맷된 HTML 이메일로 전송됩니다.</p>
+            <form id="email-results-form">
+                <input type="email" id="email-results-input" class="form-input" data-i18n-placeholder="emailResultsPlaceholder" placeholder="your@email.com" required>
+                <button type="submit" id="btn-email-results-submit" class="btn btn-primary btn-full" data-i18n="emailResultsSubmit">전송</button>
+            </form>
         </div>
     </div>
 
@@ -485,6 +486,7 @@
     ======================================== -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
 
     <!--========================================
          GOOGLE ADSENSE BODY SCRIPT   

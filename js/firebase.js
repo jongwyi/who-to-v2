@@ -57,6 +57,14 @@ export async function saveFeedbackInDB(feedback) {
     return pushRef.key;
 }
 
+export async function sendTeamResultsEmail(email, sessionCode) {
+    if (typeof firebase === 'undefined' || !firebase.functions) throw new Error('Firebase Functions not loaded');
+    const functions = firebase.functions();
+    const callable = functions.httpsCallable('sendTeamResultsEmail');
+    const result = await callable({ email: email.trim(), sessionCode: (sessionCode || '').trim().toUpperCase() });
+    return result.data;
+}
+
 export async function assignLateJoinerToTeam(code, session, student) {
     const r = ref(code);
     const teams = session.teams ? Object.values(session.teams) : [];

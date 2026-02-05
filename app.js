@@ -29,7 +29,10 @@
         });
 
         document.getElementById('btn-go-create') && document.getElementById('btn-go-create').addEventListener('click', function () {
-            tags.initCreateSessionTags();
+            if (W.params) {
+                W.params.initCreateParams();
+                W.params.populateDefaultTags();
+            }
             nav.showScreen('create-session');
         });
 
@@ -242,65 +245,59 @@
         var sessionNameInput = document.getElementById('session-name');
         var instructorNameInput = document.getElementById('instructor-name');
         var instructorPasswordInput = document.getElementById('instructor-password');
+        var paramsMod = W.params || {};
         function validateCreateForm() {
             var sessionName = sessionNameInput && sessionNameInput.value.trim();
             var name = instructorNameInput && instructorNameInput.value.trim();
             var password = instructorPasswordInput && instructorPasswordInput.value.trim();
-            var roleTags = tags.getCreateRoleTags();
-            var interestTags = tags.getCreateInterestTags();
-            var hasTags = roleTags.length > 0 && interestTags.length > 0;
+            var selectedParams = paramsMod.getSelectedParams ? paramsMod.getSelectedParams() : [];
+            var locked = paramsMod.isParamLocked ? paramsMod.isParamLocked() : false;
+            var roleTags = (paramsMod.getCreateRoleTags || tags.getCreateRoleTags)();
+            var interestTags = (paramsMod.getCreateInterestTags || tags.getCreateInterestTags)();
+            var hasRoleTags = !selectedParams.includes('role') || roleTags.length > 0;
+            var hasInterestTags = !selectedParams.includes('interest') || interestTags.length > 0;
+            var hasEnoughParams = selectedParams.length >= 2;
             var btn = document.getElementById('btn-create-session');
-            if (btn) btn.disabled = !sessionName || !name || !password || !hasTags;
+            if (btn) btn.disabled = !sessionName || !name || !password || !hasRoleTags || !hasInterestTags || !hasEnoughParams || !locked;
         }
         if (sessionNameInput) sessionNameInput.addEventListener('input', validateCreateForm);
         if (instructorNameInput) instructorNameInput.addEventListener('input', validateCreateForm);
         if (instructorPasswordInput) instructorPasswordInput.addEventListener('input', validateCreateForm);
 
-        document.getElementById('btn-add-role-tag') && document.getElementById('btn-add-role-tag').addEventListener('click', function () {
-            tags.appendCreateRoleTagRow('', '');
-            validateCreateForm();
-        });
-        document.getElementById('btn-add-interest-tag') && document.getElementById('btn-add-interest-tag').addEventListener('click', function () {
-            tags.appendCreateInterestTagRow('', '');
-            validateCreateForm();
-        });
-        document.getElementById('create-role-tags-list') && document.getElementById('create-role-tags-list').addEventListener('click', function (e) {
+        document.getElementById('param-tiles-scroll') && document.getElementById('param-tiles-scroll').addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-add-tag')) {
+                var param = e.target.dataset.param;
+                if (param === 'role' && paramsMod.appendCreateRoleTagRow) paramsMod.appendCreateRoleTagRow('', '');
+                else if (param === 'interest' && paramsMod.appendCreateInterestTagRow) paramsMod.appendCreateInterestTagRow('', '');
+                validateCreateForm();
+            }
             if (e.target.classList.contains('btn-remove-tag')) {
                 var row = e.target.closest('.create-tag-row');
                 if (row) row.remove();
                 validateCreateForm();
             }
         });
-        document.getElementById('create-interest-tags-list') && document.getElementById('create-interest-tags-list').addEventListener('click', function (e) {
-            if (e.target.classList.contains('btn-remove-tag')) {
-                var row = e.target.closest('.create-tag-row');
-                if (row) row.remove();
-                validateCreateForm();
-            }
-        });
-        document.getElementById('create-role-tags-list') && document.getElementById('create-role-tags-list').addEventListener('input', validateCreateForm);
-        document.getElementById('create-interest-tags-list') && document.getElementById('create-interest-tags-list').addEventListener('input', validateCreateForm);
+        document.getElementById('param-tiles-scroll') && document.getElementById('param-tiles-scroll').addEventListener('input', validateCreateForm);
 
-        var weightRoleSlider = document.getElementById('weight-role');
-        var weightInterestSlider = document.getElementById('weight-interest');
-        function syncWeightDisplays() {
-            var roleEl = document.getElementById('weight-role-value');
-            var interestEl = document.getElementById('weight-interest-value');
-            if (weightRoleSlider && roleEl) roleEl.textContent = weightRoleSlider.value + '%';
-            if (weightInterestSlider && interestEl) interestEl.textContent = weightInterestSlider.value + '%';
-        }
-        if (weightRoleSlider) {
-            weightRoleSlider.addEventListener('input', function () {
-                if (weightInterestSlider) weightInterestSlider.value = String(100 - parseInt(weightRoleSlider.value, 10));
-                syncWeightDisplays();
-            });
-        }
-        if (weightInterestSlider) {
-            weightInterestSlider.addEventListener('input', function () {
-                if (weightRoleSlider) weightRoleSlider.value = String(100 - parseInt(weightInterestSlider.value, 10));
-                syncWeightDisplays();
-            });
-        }
+        document.getElementById('btn-param-done') && document.getElementById('btn-param-done').addEventListener('click', function () {
+            var selected = paramsMod.getSelectedParams ? paramsMod.getSelectedParams() : [];
+            if (selected.length < 2) {
+                document.getElementById('create-error').textContent = 'Select at least 2 parameters.';
+                return;
+            }
+            var roleTags = (paramsMod.getCreateRoleTags || tags.getCreateRoleTags)();
+            var interestTags = (paramsMod.getCreateInterestTags || tags.getCreateInterestTags)();
+            if (selected.includes('role') && roleTags.length === 0) {
+                document.getElementById('create-error').textContent = 'Add at least one role tag.';
+                return;
+            }
+            if (selected.includes('interest') && interestTags.length === 0) {
+                document.getElementById('create-error').textContent = 'Add at least one interest tag.';
+                return;
+            }
+            document.getElementById('create-error').textContent = '';
+            if (paramsMod.lockParamsAndShowWeights && paramsMod.lockParamsAndShowWeights()) validateCreateForm();
+        });
 
         document.getElementById('btn-create-session') && document.getElementById('btn-create-session').addEventListener('click', async function () {
             var sessionName = (sessionNameInput && sessionNameInput.value.trim()) || '';
@@ -308,12 +305,21 @@
             var instructorEmoji = (document.getElementById('instructor-emoji') && document.getElementById('instructor-emoji').value || '').trim().slice(0, 4);
             var instructorPassword = (instructorPasswordInput && instructorPasswordInput.value.trim()) || '';
             var code = utils.generateSessionCode();
-            var roleWeight = weightRoleSlider ? parseInt(weightRoleSlider.value, 10) : 50;
             var teamSize = parseInt((document.getElementById('team-size') && document.getElementById('team-size').value) || '4', 10);
-            var roleTags = tags.getCreateRoleTags();
-            var interestTags = tags.getCreateInterestTags();
-            if (roleTags.length === 0 || interestTags.length === 0) {
-                document.getElementById('create-error').textContent = 'Add at least one role tag and one interest tag.';
+            var selectedParams = paramsMod.getSelectedParams ? paramsMod.getSelectedParams() : ['role', 'interest'];
+            var weights = paramsMod.getWeightsForSession ? paramsMod.getWeightsForSession(selectedParams) : { role: 50, interest: 50 };
+            var roleTags = (paramsMod.getCreateRoleTags || tags.getCreateRoleTags)();
+            var interestTags = (paramsMod.getCreateInterestTags || tags.getCreateInterestTags)();
+            if (!paramsMod.isParamLocked || !paramsMod.isParamLocked()) {
+                document.getElementById('create-error').textContent = 'Click "설정 완료" first.';
+                return;
+            }
+            if (selectedParams.includes('role') && roleTags.length === 0) {
+                document.getElementById('create-error').textContent = 'Add at least one role tag.';
+                return;
+            }
+            if (selectedParams.includes('interest') && interestTags.length === 0) {
+                document.getElementById('create-error').textContent = 'Add at least one interest tag.';
                 return;
             }
             var newSession = {
@@ -324,8 +330,11 @@
                 instructorEmoji: instructorEmoji || '',
                 instructorPassword: instructorPassword,
                 teamSize: teamSize,
-                weightRole: roleWeight,
-                weightInterest: 100 - roleWeight,
+                selectedParams: selectedParams,
+                weights: weights,
+                weightRole: weights.role || 0,
+                weightInterest: weights.interest || 0,
+                weightExtroversion: weights.extroversion || 0,
                 status: 'open',
                 students: {},
                 teams: {},
@@ -387,19 +396,34 @@
         document.getElementById('custom-interest') && document.getElementById('custom-interest').addEventListener('input', render.validateProfileStep);
         document.getElementById('message-to-team') && document.getElementById('message-to-team').addEventListener('input', render.validateProfileStep);
 
+        var extroversionSlider = document.getElementById('extroversion-slider');
+        if (extroversionSlider) {
+            extroversionSlider.addEventListener('input', function () {
+                var val = parseInt(extroversionSlider.value, 10) || 5;
+                state.extroversionScore = Math.max(0, Math.min(10, val));
+                var valueEl = document.getElementById('extroversion-value');
+                if (valueEl) valueEl.textContent = state.extroversionScore;
+            });
+        }
+
         document.getElementById('btn-profile-back') && document.getElementById('btn-profile-back').addEventListener('click', function () {
+            var visibleSteps = render.getVisibleProfileSteps ? render.getVisibleProfileSteps(state.currentSession) : ['role', 'interest', 'message'];
             if (state.profileStep === 1) nav.showScreen('landing');
             else render.renderProfileStep(state.profileStep - 1);
         });
 
         document.getElementById('btn-profile-next') && document.getElementById('btn-profile-next').addEventListener('click', async function () {
-            if (state.profileStep < 3) {
+            var visibleSteps = render.getVisibleProfileSteps ? render.getVisibleProfileSteps(state.currentSession) : ['role', 'interest', 'message'];
+            if (state.profileStep < visibleSteps.length) {
                 render.renderProfileStep(state.profileStep + 1);
             } else {
                 var student = state.currentStudent;
-                student.roleTagIds = state.selectedRoles.slice();
-                student.interestTagIds = state.selectedInterests.slice();
+                var session = state.currentSession;
+                var selParams = session && session.selectedParams ? session.selectedParams : ['role', 'interest'];
+                student.roleTagIds = selParams.includes('role') ? state.selectedRoles.slice() : [];
+                student.interestTagIds = selParams.includes('interest') ? state.selectedInterests.slice() : [];
                 student.customInterest = (document.getElementById('custom-interest') && document.getElementById('custom-interest').value || '').trim();
+                student.extroversionScore = selParams.includes('extroversion') ? state.extroversionScore : undefined;
                 student.messageToTeam = (document.getElementById('message-to-team') && document.getElementById('message-to-team').value || '').trim();
                 try {
                     await firebase.saveStudentInDB(state.currentSession.code, student);
@@ -511,6 +535,58 @@
         document.getElementById('btn-back-dashboard') && document.getElementById('btn-back-dashboard').addEventListener('click', function () {
             nav.showScreen('instructor-dashboard');
         });
+
+        var emailResultsOverlay = document.getElementById('email-results-overlay');
+        var emailResultsForm = document.getElementById('email-results-form');
+        var emailResultsInput = document.getElementById('email-results-input');
+        var emailResultsSubmit = document.getElementById('btn-email-results-submit');
+        document.getElementById('btn-email-results') && document.getElementById('btn-email-results').addEventListener('click', function () {
+            if (emailResultsOverlay) {
+                if (W.i18n && W.i18n.applyToPage) W.i18n.applyToPage();
+                emailResultsOverlay.classList.add('email-results-visible');
+                if (emailResultsInput) emailResultsInput.value = '';
+            }
+        });
+        document.getElementById('email-results-close') && document.getElementById('email-results-close').addEventListener('click', function () {
+            if (emailResultsOverlay) emailResultsOverlay.classList.remove('email-results-visible');
+        });
+        if (emailResultsOverlay) {
+            emailResultsOverlay.addEventListener('click', function (e) {
+                if (e.target === emailResultsOverlay) emailResultsOverlay.classList.remove('email-results-visible');
+            });
+        }
+        if (emailResultsForm) {
+            emailResultsForm.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                var email = emailResultsInput && emailResultsInput.value.trim();
+                if (!email) return;
+                var confirmMsg = (W.i18n && W.i18n.t) ? W.i18n.t('emailResultsConfirm') : '이메일로 전송하시겠습니까?';
+                if (!confirm(confirmMsg)) return;
+                var session = state.currentSession;
+                if (!session || !session.code) {
+                    alert((W.i18n && W.i18n.t) ? W.i18n.t('emailResultsError') : '세션이 없습니다.');
+                    return;
+                }
+                var teams = session.teams ? Object.values(session.teams) : [];
+                if (teams.length === 0) {
+                    alert((W.i18n && W.i18n.t) ? W.i18n.t('emailResultsNoTeams') : '매칭된 팀이 없습니다. 먼저 매칭을 실행하세요.');
+                    return;
+                }
+                if (emailResultsSubmit) emailResultsSubmit.disabled = true;
+                try {
+                    await firebase.sendTeamResultsEmail(email, session.code);
+                    var successMsg = (W.i18n && W.i18n.t) ? W.i18n.t('emailResultsSuccess') : '전송되었습니다. 이메일을 확인해주세요.';
+                    alert(successMsg);
+                    emailResultsOverlay.classList.remove('email-results-visible');
+                    emailResultsForm.reset();
+                } catch (err) {
+                    var errMsg = (err && err.message) ? err.message : ((W.i18n && W.i18n.t) ? W.i18n.t('emailResultsError') : '전송에 실패했습니다.');
+                    alert(errMsg);
+                } finally {
+                    if (emailResultsSubmit) emailResultsSubmit.disabled = false;
+                }
+            });
+        }
     }
 
     window.WHO2MEET_initEvents = initEvents;
