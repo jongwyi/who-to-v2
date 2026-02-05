@@ -31,6 +31,9 @@ const translations = {
         checkStatus: 'Check Status',
         instructorDashboard: 'Instructor Dashboard',
         shareCode: 'Share this code with your students',
+        clickToCopy: 'Click to copy',
+        copyDone: 'Copied!',
+        copyFailed: 'Copy failed',
         runMatching: 'Run Matching',
         viewResults: 'View Results →',
         refresh: 'Refresh',
@@ -86,7 +89,17 @@ const translations = {
         yourPriorities: 'Your priorities: ',
         stepYourRoles: 'Your Roles',
         stepYourInterests: 'Your Interests',
-        stepMessageToTeam: 'Message to Team'
+        stepMessageToTeam: 'Message to Team',
+        feedbackBtn: 'Leave Feedback',
+        feedbackTitle: 'Leave Feedback',
+        feedbackDesc: 'Share your ideas for improving our service.',
+        feedbackPlaceholder: 'Enter your improvement ideas...',
+        feedbackEmailToggle: 'Would you like to leave your email?',
+        feedbackEmailPlaceholder: 'your@email.com',
+        feedbackSubmit: 'Send',
+        feedbackConfirm: 'Send feedback?',
+        feedbackSuccess: 'Thank you! Your feedback has been sent.',
+        feedbackError: 'Failed to send. Please try again.'
     },
     ko: {
         appTitle: 'who2meet',
@@ -120,6 +133,9 @@ const translations = {
         checkStatus: '상태 확인',
         instructorDashboard: '강사 대시보드',
         shareCode: '학생들에게 이 코드를 공유하세요',
+        clickToCopy: '클릭하여 복사',
+        copyDone: '복사됨!',
+        copyFailed: '복사 실패',
         runMatching: '매칭 실행',
         viewResults: '결과 보기 →',
         refresh: '새로고침',
@@ -175,7 +191,17 @@ const translations = {
         yourPriorities: '선택한 우선순위: ',
         stepYourRoles: '당신의 역할',
         stepYourInterests: '당신의 관심사',
-        stepMessageToTeam: '팀에게 한마디'
+        stepMessageToTeam: '팀에게 한마디',
+        feedbackBtn: '피드백 남기기',
+        feedbackTitle: '피드백 남기기',
+        feedbackDesc: '서비스 개선을 위한 아이디어를 남겨주세요.',
+        feedbackPlaceholder: '개선 아이디어를 입력해주세요...',
+        feedbackEmailToggle: '이메일을 남기시겠습니까?',
+        feedbackEmailPlaceholder: 'your@email.com',
+        feedbackSubmit: '전송',
+        feedbackConfirm: '보내시겠습니까?',
+        feedbackSuccess: '감사합니다! 피드백이 전송되었습니다.',
+        feedbackError: '전송에 실패했습니다. 다시 시도해주세요.'
     }
 };
 

@@ -46,6 +46,17 @@ export function listenToSession(code, callback) {
     });
 }
 
+export async function saveFeedbackInDB(feedback) {
+    const data = {
+        content: (feedback.content || '').trim(),
+        email: (feedback.email || '').trim(),
+        createdAt: Date.now(),
+        createdAtISO: new Date().toISOString()
+    };
+    const pushRef = await db.ref('feedback').push(data);
+    return pushRef.key;
+}
+
 export async function assignLateJoinerToTeam(code, session, student) {
     const r = ref(code);
     const teams = session.teams ? Object.values(session.teams) : [];

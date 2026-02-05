@@ -10,6 +10,8 @@ import * as i18n from './i18n.js';
 import * as renderfortest from './renderfortest.js';
 import * as tutorial from './tutorial.js';
 import * as landingRole from './landing-role.js';
+import * as copyserial from './copyserial.js';
+import * as emojiPicker from './emoji-picker.js';
 
 firebase.initFirebase(firebaseConfig);
 
@@ -24,7 +26,9 @@ window.WHO2MEET = {
     i18n,
     renderfortest,
     tutorial,
-    landingRole
+    landingRole,
+    copyserial,
+    emojiPicker
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -54,4 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     landingRole.initLandingRole();
     tutorial.initTutorial();
+    copyserial.initCopySerial();
+    emojiPicker.initEmojiPicker();
 });
