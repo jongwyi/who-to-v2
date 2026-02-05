@@ -216,7 +216,7 @@ exports.sendTeamResultsEmail = functions
     const apiKey = resendApiKey.value() || process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error('Resend API key not configured. Add RESEND_API_KEY secret in Secret Manager.');
-      throw new functions.https.HttpsError('internal', 'Email service not configured.');
+      throw new functions.https.HttpsError('failed-precondition', 'Email service not configured. Contact admin.');
     }
 
     const resend = new Resend(apiKey);
@@ -248,7 +248,7 @@ exports.sendTeamResultsEmail = functions
     if (error) {
       console.error('Resend error:', error);
       const errMsg = (error && error.message) ? error.message : 'Unknown error';
-      throw new functions.https.HttpsError('internal', `Failed to send email: ${errMsg}`);
+      throw new functions.https.HttpsError('failed-precondition', `Failed to send email: ${errMsg}`);
     }
 
     return { success: true, message: 'Email sent.' };
