@@ -75,24 +75,28 @@
                     <h1 class="hero-title" data-i18n="appTitle">WHO2MEET</h1>
                     <p class="hero-subtitle" data-i18n="subtitle">Find Your Perfect Team</p>
                 </div>
-                <div class="card">
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="sessionCode">Session Code</label>
-                        <input type="text" id="join-code" class="form-input" placeholder="Enter 6-character code" maxlength="6">
-                    </div>
-                    <button id="btn-go-join" class="btn btn-primary btn-full" disabled data-i18n="joinSession">Join Session →</button>
-                </div>
-                <div class="divider"><span>or</span></div>
-                <button id="btn-go-create" class="btn btn-secondary btn-full" data-i18n="createSession">Create New Session (Instructor)</button>
-                <p class="hint-text" style="margin-top: 1rem; text-align: center;">
-                    <a href="#" id="btn-instructor-relogin" class="link" data-i18n="reEnterInstructor">Re-enter as Instructor →</a>
+                <div id="landing-content-wrap" style="display: none;">
+                <p class="hint-text" style="text-align: center; margin-bottom: 1rem;">
+                    <a href="#" id="btn-change-role" class="link" data-i18n="changeRole">역할 변경</a>
                 </p>
-                <div class="divider" style="margin-top: 1.5rem;"><span data-i18n="newToService">New here?</span></div>
-                <a href="#" id="btn-view-tutorial" class="tutorial-entry-link" data-i18n="viewTutorial">
-                    <span class="tutorial-entry-icon">📚</span> <span class="tutorial-entry-text">View Tutorial →</span>
-                </a>
-                <div class="divider" style="margin-top: 1.5rem;"><span>Test</span></div>
-                <button id="btn-quick-test" class="btn btn-ghost btn-full" type="button">🧪 Quick Test (30 users)</button>
+                <!-- 학생 뷰 -->
+                <div id="landing-student" class="landing-role-view" style="display: none;">
+                    <div class="card">
+                        <div class="form-group">
+                            <label class="form-label" data-i18n="sessionCode">세션 코드</label>
+                            <input type="text" id="join-code" class="form-input" data-i18n-placeholder="sessionCodePlaceholder" placeholder="세션 코드 입력" maxlength="6">
+                        </div>
+                        <button id="btn-go-join" class="btn btn-primary btn-full" disabled data-i18n="joinSession">세션 참가 →</button>
+                    </div>
+                </div>
+                <!-- 강사 뷰 -->
+                <div id="landing-instructor" class="landing-role-view" style="display: none;">
+                    <button id="btn-go-create" class="btn btn-secondary btn-full" data-i18n="createSession">새 세션 만들기 (강사)</button>
+                    <p class="hint-text" style="text-align: center; margin-top: 1rem;">
+                        <a href="#" id="btn-instructor-relogin" class="link" data-i18n="reEnterInstructor">이미 세션을 생성하셨나요? 강사로 다시 로그인 →</a>
+                    </p>
+                </div>
+                </div>
             </div>
         </section>
 
@@ -340,8 +344,9 @@
                     <h4 id="dashboard-session-name"></h4>
                     <p class="session-details" id="dashboard-details"></p>
                     <p class="session-status" id="dashboard-status"></p>
-                    <p class="student-count" id="dashboard-student-count">Students joined: 0</p>
+                    <p class="student-count" id="dashboard-student-count"></p>
                     <div class="nav-buttons">
+                        <button id="btn-quick-test" class="btn btn-ghost btn-small" data-i18n="quickTestBtn" title="새 세션 + 30명 랜덤 학생으로 빠른 테스트">🧪 30명 테스트</button>
                         <button id="btn-refresh" class="btn btn-secondary" data-i18n="refresh">Refresh</button>
                         <button id="btn-run-matching" class="btn btn-primary">🎲 Run Matching</button>
                     </div>
@@ -372,6 +377,26 @@
             </div>
         </section>
     </main>
+
+    <!-- Landing: Role Selection Popup (학생/강사 선택) -->
+    <div id="landing-role-modal" class="tutorial-overlay" aria-hidden="true">
+        <div class="tutorial-modal landing-role-modal">
+            <h2 class="tutorial-modal-title" data-i18n="roleSelectTitle">역할을 선택하세요</h2>
+            <p class="tutorial-modal-subtitle" data-i18n="roleSelectSubtitle">학생 또는 강사 중 하나를 선택하세요</p>
+            <div class="tutorial-role-cards">
+                <button type="button" class="tutorial-role-card" data-landing-role="participant">
+                    <span class="tutorial-role-icon">🎓</span>
+                    <span class="tutorial-role-title" data-i18n="student">학생</span>
+                    <span class="tutorial-role-desc" data-i18n="studentDesc">세션에 참가하고 역할을 선택합니다</span>
+                </button>
+                <button type="button" class="tutorial-role-card" data-landing-role="instructor">
+                    <span class="tutorial-role-icon">👩‍🏫</span>
+                    <span class="tutorial-role-title" data-i18n="instructor">강사</span>
+                    <span class="tutorial-role-desc" data-i18n="instructorDesc">세션을 생성하고 학생들을 매칭합니다</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Tutorial: Role Selection Modal -->
     <div id="tutorial-role-modal" class="tutorial-overlay" aria-hidden="true">

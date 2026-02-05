@@ -1,4 +1,21 @@
 import { t } from './i18n.js';
+import { state } from './state.js';
+
+const STORAGE_KEY = 'who2meet_tutorial_seen';
+
+function markTutorialSeen() {
+    try {
+        localStorage.setItem(STORAGE_KEY, '1');
+    } catch (_) {}
+}
+
+function hasSeenTutorial() {
+    try {
+        return !!localStorage.getItem(STORAGE_KEY);
+    } catch (_) {
+        return false;
+    }
+}
 
 const TUTORIAL_STEPS = {
     instructor: [
@@ -32,6 +49,7 @@ function hideRoleModal() {
     if (modal) {
         modal.classList.remove('tutorial-overlay-visible');
         modal.setAttribute('aria-hidden', 'true');
+        markTutorialSeen();
     }
 }
 
@@ -49,6 +67,7 @@ function hideStepModal() {
     if (modal) {
         modal.classList.remove('tutorial-overlay-visible');
         modal.setAttribute('aria-hidden', 'true');
+        markTutorialSeen();
     }
 }
 
@@ -90,11 +109,19 @@ function startTutorial(role) {
     showStepModal();
 }
 
+export function showTutorialForRole(role) {
+    if (!role || !TUTORIAL_STEPS[role]) return;
+    currentRole = role;
+    currentStep = 0;
+    showStepModal();
+}
+
 function nextStep() {
     if (currentStep < totalSteps - 1) {
         currentStep++;
         renderStep();
     } else {
+        markTutorialSeen();
         hideStepModal();
     }
 }
@@ -125,7 +152,10 @@ export function initTutorial() {
     if (btnViewTutorial) {
         btnViewTutorial.addEventListener('click', (e) => {
             e.preventDefault();
-            showRoleModal();
+            const role = state.landingRole;
+            if (role === 'participant' || role === 'instructor') {
+                showTutorialForRole(role);
+            }
         });
     }
 

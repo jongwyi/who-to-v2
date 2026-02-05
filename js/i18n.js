@@ -44,6 +44,10 @@ const translations = {
         new: 'new',
         viewTutorial: 'View Tutorial →',
         newToService: 'New here?',
+        changeRole: 'Change Role',
+        roleSelectTitle: 'Select a role',
+        roleSelectSubtitle: 'Select either student or instructor',
+        sessionCodePlaceholder: 'Enter session code',
         roleSelection: 'Role Selection',
         roleSelectionSubtitle: 'Select a role to view the tutorial',
         instructor: 'Instructor',
@@ -68,7 +72,21 @@ const translations = {
         tutorialParticipantStep3: 'Step 3: Select Interests',
         tutorialParticipantStep3Desc: 'Select your interests from the available tags. Add a custom interest if needed. Write a short message to your future teammates.',
         tutorialParticipantStep4: 'Step 4: View Team',
-        tutorialParticipantStep4Desc: 'After the instructor runs matching, you will see your assigned team. View your teammates\' roles, interests, and messages. Start collaborating!'
+        tutorialParticipantStep4Desc: 'After the instructor runs matching, you will see your assigned team. View your teammates\' roles, interests, and messages. Start collaborating!',
+        dashboardWeights: 'Weights: %1% Role / %2% Interest',
+        teamsPublished: '✅ Teams Published',
+        openForRegistration: '⏳ Open for Registration',
+        studentsJoinedCount: 'Students joined: %1',
+        quickTestSessionName: 'Quick Test Session (30 users)',
+        quickTestBtn: '🧪 Quick Test (30)',
+        allFondOf: 'All fond of:',
+        interestLabel: 'Interest:',
+        priority1st: '1st',
+        priority2nd: '2nd',
+        yourPriorities: 'Your priorities: ',
+        stepYourRoles: 'Your Roles',
+        stepYourInterests: 'Your Interests',
+        stepMessageToTeam: 'Message to Team'
     },
     ko: {
         appTitle: 'WHO2MEET',
@@ -115,6 +133,10 @@ const translations = {
         new: 'new',
         viewTutorial: '튜토리얼 보기 →',
         newToService: '처음이신가요?',
+        changeRole: '역할 변경',
+        roleSelectTitle: '역할을 선택하세요',
+        roleSelectSubtitle: '학생 또는 강사 중 하나를 선택하세요',
+        sessionCodePlaceholder: '세션 코드 입력',
         roleSelection: '역할 선택',
         roleSelectionSubtitle: '튜토리얼을 보려면 역할을 선택하세요',
         instructor: '강사',
@@ -139,11 +161,25 @@ const translations = {
         tutorialParticipantStep3: '3단계: 관심사 선택',
         tutorialParticipantStep3Desc: '제공된 태그에서 관심사를 선택하세요. 필요시 직접 관심사를 추가할 수 있습니다. 미래의 팀원들에게 한마디를 적어주세요.',
         tutorialParticipantStep4: '4단계: 팀 확인',
-        tutorialParticipantStep4Desc: '강사가 매칭을 실행한 후 배정된 팀을 확인할 수 있습니다. 팀원들의 역할, 관심사, 메시지를 보고 함께 협업을 시작하세요!'
+        tutorialParticipantStep4Desc: '강사가 매칭을 실행한 후 배정된 팀을 확인할 수 있습니다. 팀원들의 역할, 관심사, 메시지를 보고 함께 협업을 시작하세요!',
+        dashboardWeights: '가중치: %1% 역할 / %2% 관심사',
+        teamsPublished: '✅ 팀 배정 완료',
+        openForRegistration: '⏳ 등록 진행 중',
+        studentsJoinedCount: '참가한 학생: %1',
+        quickTestSessionName: '빠른 테스트 세션 (30명)',
+        quickTestBtn: '🧪 30명 테스트',
+        allFondOf: '공통 관심사:',
+        interestLabel: '관심사:',
+        priority1st: '1순위',
+        priority2nd: '2순위',
+        yourPriorities: '선택한 우선순위: ',
+        stepYourRoles: '당신의 역할',
+        stepYourInterests: '당신의 관심사',
+        stepMessageToTeam: '팀에게 한마디'
     }
 };
 
-let currentLang = 'en';
+let currentLang = 'ko';
 
 export function getLang() {
     return currentLang;
@@ -155,6 +191,13 @@ export function setLang(lang) {
 
 export function t(key) {
     return translations[currentLang][key] ?? translations.en[key] ?? key;
+}
+
+/** Format string with %1, %2, ... placeholders */
+export function tf(key, ...args) {
+    let s = t(key);
+    args.forEach((a, i) => { s = s.replace('%' + (i + 1), String(a)); });
+    return s;
 }
 
 export function applyToPage() {

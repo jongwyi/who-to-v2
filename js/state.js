@@ -1,5 +1,6 @@
 export const state = {
     currentScreen: 'landing',
+    landingRole: null,
     profileStep: 1,
     currentSession: null,
     currentStudent: null,

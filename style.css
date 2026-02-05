@@ -446,6 +446,23 @@ body {
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
     position: relative;
 }
+#landing-role-modal .tutorial-modal.landing-role-modal {
+    max-width: 1040px !important;
+    width: 95vw !important;
+    min-width: 900px;
+    padding: 64px;
+    font-size: 1.2rem;
+}
+#landing-role-modal .tutorial-modal-title { font-size: 36px !important; margin-bottom: 16px; }
+#landing-role-modal .tutorial-modal-subtitle { font-size: 22px !important; margin-bottom: 48px; }
+#landing-role-modal .tutorial-role-cards { gap: 48px; }
+#landing-role-modal .tutorial-role-card {
+    min-width: 360px;
+    padding: 48px;
+}
+#landing-role-modal .tutorial-role-icon { font-size: 96px !important; }
+#landing-role-modal .tutorial-role-title { font-size: 28px !important; }
+#landing-role-modal .tutorial-role-desc { font-size: 18px !important; }
 .tutorial-close {
     position: absolute;
     top: 16px;

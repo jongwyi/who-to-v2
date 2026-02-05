@@ -5,6 +5,7 @@ import * as nav from './nav.js';
 import * as render from './render.js';
 import * as matching from './matching.js';
 import { ROLE_TAGS, INTEREST_TAGS } from './config.js';
+import { t } from './i18n.js';
 
 const TEST_EMOJIS = ['😀', '😊', '🤓', '😎', '🧑‍💻', '👩‍🔬', '👨‍🎨', '👩‍💼', '🙂', '😌', '🤔', '😏', '🥳', '😇', '🤗', '🧐', '😺', '🐶', '🦊', '🐼', '🦁', '🐯', '🐸', '🐵', '🦉', '🐧', '🦋', '🌟', '✨', '🔥'];
 
@@ -16,7 +17,7 @@ export async function runQuickTest() {
     const newSession = {
         id: utils.generateId(),
         code,
-        name: 'Quick Test Session (30 users)',
+        name: t('quickTestSessionName'),
         instructorName: 'Test Instructor',
         instructorEmoji: '👩‍🏫',
         instructorPassword: 'test123',
